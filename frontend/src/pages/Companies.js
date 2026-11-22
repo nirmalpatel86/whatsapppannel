@@ -1,0 +1,173 @@
+import { useState, useEffect, useCallback } from 'react';
+import api from '../services/api';
+import alert from '../utils/alert';
+import { FiPlus, FiBriefcase, FiX } from 'react-icons/fi';
+
+const Companies = () => {
+  const [companies, setCompanies] = useState([]);
+  const [showCreate, setShowCreate] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState({
+    name: '', plan: 'free', maxWhatsappAccounts: 2, maxCampaignsPerDay: 5,
+  });
+
+  const fetchCompanies = useCallback(async () => {
+    try {
+      const res = await api.get('/companies');
+      setCompanies(res.data.companies);
+    } catch (err) {
+      alert.error('Failed to load companies');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchCompanies(); }, [fetchCompanies]);
+
+  const createCompany = async () => {
+    if (!form.name) { alert.error('Name is required'); return; }
+    try {
+      await api.post('/companies', form);
+      alert.success('Company created');
+      setShowCreate(false);
+      setForm({ name: '', plan: 'free', maxWhatsappAccounts: 2, maxCampaignsPerDay: 5 });
+      fetchCompanies();
+    } catch (err) {
+      alert.error('Failed to create');
+    }
+  };
+
+  const planColors = { free: '#6b7280', basic: '#3b82f6', pro: '#7c3aed', enterprise: '#e8b931' };
+
+  if (loading) return <div style={{ padding: 28, color: '#6b7280' }}>Loading...</div>;
+
+  return (
+    <div style={{ padding: '24px 28px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <div>
+          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 22, fontWeight: 700 }}>Companies</h2>
+          <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>{companies.length} companies</p>
+        </div>
+        <button onClick={() => setShowCreate(true)} style={styles.primaryBtn}>
+          <FiPlus size={18} /> Add Company
+        </button>
+      </div>
+
+      {showCreate && (
+        <div style={styles.createPanel}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#111827' }}>Create Company</h3>
+            <button onClick={() => setShowCreate(false)} style={styles.iconBtn}><FiX size={16} /></button>
+          </div>
+          <div style={styles.formGrid}>
+            <div style={styles.field}>
+              <label style={styles.label}>Company Name *</label>
+              <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} style={styles.input} placeholder="e.g. Acme Corp" />
+            </div>
+            <div style={styles.field}>
+              <label style={styles.label}>Plan</label>
+              <select value={form.plan} onChange={(e) => setForm({ ...form, plan: e.target.value })} style={styles.input}>
+                <option value="free">Free</option>
+                <option value="basic">Basic</option>
+                <option value="pro">Pro</option>
+                <option value="enterprise">Enterprise</option>
+              </select>
+            </div>
+            <div style={styles.field}>
+              <label style={styles.label}>Max WhatsApp Accounts</label>
+              <input type="number" value={form.maxWhatsappAccounts} onChange={(e) => setForm({ ...form, maxWhatsappAccounts: parseInt(e.target.value) })} style={styles.input} />
+            </div>
+            <div style={styles.field}>
+              <label style={styles.label}>Max Campaigns/Day</label>
+              <input type="number" value={form.maxCampaignsPerDay} onChange={(e) => setForm({ ...form, maxCampaignsPerDay: parseInt(e.target.value) })} style={styles.input} />
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 12 }}>
+            <button onClick={createCompany} style={styles.primaryBtn}>Create</button>
+            <button onClick={() => setShowCreate(false)} style={styles.secondaryBtn}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))' }}>
+        {companies.map(company => (
+          <div key={company.id} style={styles.card}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={styles.companyIcon}><FiBriefcase size={18} /></div>
+                <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#111827' }}>{company.name}</h3>
+              </div>
+              <span style={{
+                padding: '4px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600,
+                background: (planColors[company.plan] || '#6b7280') + '20',
+                color: planColors[company.plan] || '#6b7280',
+              }}>
+                {company.plan}
+              </span>
+            </div>
+            <p style={{ margin: '8px 0 0', fontSize: 13, color: '#6b7280' }}>
+              Owner: {company.owner?.name || 'N/A'} ({company.owner?.email || ''})
+            </p>
+            <div style={{ display: 'flex', gap: 16, marginTop: 12, fontSize: 13, color: '#9ca3af' }}>
+              <span>WA Accounts: <strong style={{ color: '#374151' }}>{company.maxWhatsappAccounts}</strong></span>
+              <span>Campaigns/Day: <strong style={{ color: '#374151' }}>{company.maxCampaignsPerDay}</strong></span>
+            </div>
+            <div style={{ marginTop: 10 }}>
+              <span style={{
+                padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600,
+                background: company.isActive ? '#22c55e20' : '#ef444420',
+                color: company.isActive ? '#22c55e' : '#ef4444',
+              }}>
+                {company.isActive ? 'Active' : 'Inactive'}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {companies.length === 0 && !showCreate && (
+        <div style={{ textAlign: 'center', padding: 60, color: '#9ca3af' }}>
+          <FiBriefcase size={48} style={{ opacity: 0.3, marginBottom: 12 }} />
+          <h3 style={{ color: '#6b7280', margin: '0 0 8px' }}>No companies yet</h3>
+          <p style={{ margin: 0, fontSize: 14 }}>Create a company to get started.</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const styles = {
+  primaryBtn: {
+    display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px',
+    background: '#e8b931', color: '#111827', border: 'none', borderRadius: 10,
+    fontWeight: 600, cursor: 'pointer', fontSize: 14, boxShadow: '0 2px 8px rgba(232,185,49,0.25)',
+  },
+  secondaryBtn: {
+    padding: '10px 20px', background: '#f3f4f6', color: '#374151',
+    border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 14,
+  },
+  iconBtn: { background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 4 },
+  createPanel: {
+    background: 'white', borderRadius: 14, padding: 24, marginBottom: 24,
+    boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb',
+  },
+  formGrid: {
+    display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 16,
+  },
+  field: { marginBottom: 0 },
+  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 13 },
+  input: {
+    width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb',
+    borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#f9fafb',
+  },
+  card: {
+    background: 'white', borderRadius: 14, padding: 20,
+    boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb',
+  },
+  companyIcon: {
+    width: 38, height: 38, borderRadius: 10, background: '#e8b931',
+    color: '#111827', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+  },
+};
+
+export default Companies;

@@ -1,0 +1,14 @@
+node_modules/
+.env
+backend/wa_sessions/
+backend/uploads/
+backend/migrations/output/
+frontend/build/
+*.log
+
+# Legacy PHP projects (migrated to React/Node, kept locally for reference only)
+bulkmail/
+smsby2/
+
+# Disabled nested git repo from original create-react-app scaffold (harmless leftover, not tracked)
+frontend/.git_disabled_cra_init/
