@@ -1,11 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import Swal from 'sweetalert2';
-import { FiPlus, FiX, FiEdit2, FiUserCheck, FiUserX, FiUsers } from 'react-icons/fi';
+import { FiPlus, FiX, FiEdit2, FiUserCheck, FiUserX, FiUsers, FiLogIn } from 'react-icons/fi';
+
+const PHONE_REGEX = /^\d{12}$/;
+const ROLE_RANK = { super_admin: 4, admin: 3, reseller: 2, user: 1 };
 
 const SmsUsers = () => {
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, impersonate } = useAuth();
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -26,6 +31,7 @@ const SmsUsers = () => {
 
   const createUser = async () => {
     if (!form.name || !form.phone || !form.password) { Swal.fire({ icon: 'warning', title: 'Required', text: 'Name, phone and password are required' }); return; }
+    if (!PHONE_REGEX.test(form.phone)) { Swal.fire({ icon: 'warning', title: 'Invalid Phone', text: 'Mobile number must be exactly 12 digits (country code + number), e.g. 919876543210' }); return; }
     try {
       await api.post('/sms/users', form);
       Swal.fire({ icon: 'success', title: 'User Created', timer: 1200, showConfirmButton: false });
@@ -39,6 +45,7 @@ const SmsUsers = () => {
 
   const saveEdit = async () => {
     if (!editForm.name || !editForm.email) { Swal.fire({ icon: 'warning', title: 'Required', text: 'Name and email required' }); return; }
+    if (!PHONE_REGEX.test(editForm.phone)) { Swal.fire({ icon: 'warning', title: 'Invalid Phone', text: 'Mobile number must be exactly 12 digits (country code + number), e.g. 919876543210' }); return; }
     try {
       const data = { name: editForm.name, phone: editForm.phone, email: editForm.email, role: editForm.role };
       if (editForm.password) data.password = editForm.password;
@@ -46,6 +53,17 @@ const SmsUsers = () => {
       Swal.fire({ icon: 'success', title: 'Updated', timer: 1200, showConfirmButton: false });
       setEditUser(null); fetchUsers();
     } catch (err) { Swal.fire({ icon: 'error', title: 'Error', text: err.response?.data?.error || 'Failed' }); }
+  };
+
+  const loginAsUser = async (u) => {
+    if (!window.confirm(`Login as ${u.name}? You can return to your own account anytime.`)) return;
+    try {
+      const res = await api.post(`/sms/users/${u.id}/impersonate`);
+      impersonate(res.data.token, res.data.user, 'sms');
+      navigate('/sms/dashboard');
+    } catch (err) {
+      Swal.fire({ icon: 'error', title: 'Error', text: err.response?.data?.error || 'Failed to login as user' });
+    }
   };
 
   const roleColors = { super_admin: '#7c3aed', admin: '#db2777', reseller: '#2563eb', user: '#059669' };
@@ -62,27 +80,31 @@ const SmsUsers = () => {
       </div>
 
       {showCreate && (
-        <div style={styles.createPanel}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#111827' }}>Add User</h3>
-            <button onClick={() => setShowCreate(false)} style={styles.iconBtn}><FiX size={16} /></button>
-          </div>
-          <div style={styles.formGrid}>
-            <div style={styles.field}><label style={styles.label}>Name *</label><input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} style={styles.input} placeholder="Full name" /></div>
-            <div style={styles.field}><label style={styles.label}>Phone *</label><input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} style={styles.input} placeholder="919876543210" /></div>
-            <div style={styles.field}><label style={styles.label}>Email</label><input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} style={styles.input} /></div>
-            <div style={styles.field}><label style={styles.label}>Password *</label><input type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} style={styles.input} /></div>
-            {['super_admin', 'admin'].includes(currentUser?.role) && (
-              <div style={styles.field}><label style={styles.label}>Role</label>
-                <select value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))} style={styles.input}>
-                  <option value="user">User</option><option value="reseller">Reseller</option><option value="admin">Admin</option><option value="super_admin">Super Admin</option>
-                </select>
+        <div style={styles.modalOverlay} onClick={() => setShowCreate(false)}>
+          <div style={styles.modal} onClick={e => e.stopPropagation()}>
+            <div style={styles.modalHeader}>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' }}>Add User</h3>
+              <button onClick={() => setShowCreate(false)} style={{ background: '#f3f4f6', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 6, borderRadius: 8 }}><FiX size={18} /></button>
+            </div>
+            <div style={{ padding: '20px 24px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                <div style={styles.field}><label style={styles.label}>Name *</label><input autoComplete="off" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} style={styles.input} placeholder="Full name" /></div>
+                <div style={styles.field}><label style={styles.label}>Phone * (12 digits)</label><input autoComplete="off" inputMode="numeric" maxLength={12} value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value.replace(/\D/g, '').slice(0, 12) }))} style={styles.input} placeholder="919876543210" /></div>
+                <div style={styles.field}><label style={styles.label}>Email</label><input type="email" autoComplete="off" name="new-user-email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} style={styles.input} /></div>
+                <div style={styles.field}><label style={styles.label}>Password *</label><input type="password" autoComplete="new-password" name="new-user-password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} style={styles.input} /></div>
+                {['super_admin', 'admin'].includes(currentUser?.role) && (
+                  <div style={styles.field}><label style={styles.label}>Role</label>
+                    <select value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))} style={styles.input}>
+                      <option value="user">User</option><option value="reseller">Reseller</option><option value="admin">Admin</option><option value="super_admin">Super Admin</option>
+                    </select>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-          <div style={{ display: 'flex', gap: 12 }}>
-            <button onClick={createUser} style={styles.primaryBtn}>Create User</button>
-            <button onClick={() => setShowCreate(false)} style={styles.secondaryBtn}>Cancel</button>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, padding: '16px 24px', borderTop: '1px solid #f3f4f6', background: '#f9fafb' }}>
+              <button onClick={() => setShowCreate(false)} style={styles.secondaryBtn}>Cancel</button>
+              <button onClick={createUser} style={styles.primaryBtn}>Create User</button>
+            </div>
           </div>
         </div>
       )}
@@ -99,10 +121,10 @@ const SmsUsers = () => {
             </div>
             <div style={{ padding: '20px 24px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                <div style={styles.field}><label style={styles.label}>Name *</label><input value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} style={styles.input} /></div>
-                <div style={styles.field}><label style={styles.label}>Phone</label><input value={editForm.phone} onChange={e => setEditForm(f => ({ ...f, phone: e.target.value }))} style={styles.input} /></div>
-                <div style={styles.field}><label style={styles.label}>Email</label><input type="email" value={editForm.email} onChange={e => setEditForm(f => ({ ...f, email: e.target.value }))} style={styles.input} /></div>
-                <div style={styles.field}><label style={styles.label}>New Password</label><input type="password" value={editForm.password} onChange={e => setEditForm(f => ({ ...f, password: e.target.value }))} style={styles.input} placeholder="Leave blank to keep" /></div>
+                <div style={styles.field}><label style={styles.label}>Name *</label><input autoComplete="off" value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} style={styles.input} /></div>
+                <div style={styles.field}><label style={styles.label}>Phone (12 digits)</label><input autoComplete="off" inputMode="numeric" maxLength={12} value={editForm.phone} onChange={e => setEditForm(f => ({ ...f, phone: e.target.value.replace(/\D/g, '').slice(0, 12) }))} style={styles.input} /></div>
+                <div style={styles.field}><label style={styles.label}>Email</label><input type="email" autoComplete="off" name="edit-user-email" value={editForm.email} onChange={e => setEditForm(f => ({ ...f, email: e.target.value }))} style={styles.input} /></div>
+                <div style={styles.field}><label style={styles.label}>New Password</label><input type="password" autoComplete="new-password" name="edit-user-password" value={editForm.password} onChange={e => setEditForm(f => ({ ...f, password: e.target.value }))} style={styles.input} placeholder="Leave blank to keep" /></div>
                 {['super_admin', 'admin'].includes(currentUser?.role) && (
                   <div style={styles.field}><label style={styles.label}>Role</label>
                     <select value={editForm.role} onChange={e => setEditForm(f => ({ ...f, role: e.target.value }))} style={styles.input}>
@@ -137,6 +159,9 @@ const SmsUsers = () => {
                       <>
                         <button onClick={() => { setEditUser(u); setEditForm({ name: u.name, phone: u.phone || '', email: u.email || '', role: u.role, password: '' }); }} style={styles.actionBtn}><FiEdit2 size={14} color="#2563eb" /></button>
                         <button onClick={() => toggleActive(u.id, u.isActive)} style={styles.actionBtn}>{u.isActive ? <FiUserX size={14} color="#ef4444" /> : <FiUserCheck size={14} color="#22c55e" />}</button>
+                        {u.isActive && (ROLE_RANK[u.role] || 0) < (ROLE_RANK[currentUser?.role] || 0) && (
+                          <button onClick={() => loginAsUser(u)} style={styles.actionBtn} title="Login as this user"><FiLogIn size={14} color="#3B82F6" /></button>
+                        )}
                       </>
                     )}
                   </div>
@@ -157,8 +182,6 @@ const styles = {
   primaryBtn: { display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: '#3B82F6', color: '#ffffff', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 14, boxShadow: '0 2px 8px rgba(59,130,246,0.25)' },
   secondaryBtn: { padding: '10px 20px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 14 },
   iconBtn: { background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 4 },
-  createPanel: { background: 'white', borderRadius: 14, padding: 24, marginBottom: 24, boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' },
-  formGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 16 },
   field: { marginBottom: 0 },
   label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 13 },
   input: { width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#f9fafb' },

@@ -2,12 +2,19 @@ import { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import alert from '../utils/alert';
 import {
   FiHome, FiMessageSquare, FiUsers, FiSend, FiSmartphone,
   FiLogOut, FiMenu, FiFileText, FiBriefcase, FiDollarSign, FiList,
   FiFolder, FiSearch, FiMail, FiSettings, FiKey, FiBarChart2,
-  FiServer, FiHash, FiNavigation, FiGrid
+  FiServer, FiHash, FiNavigation, FiGrid, FiUserCheck, FiCornerUpLeft
 } from 'react-icons/fi';
+
+const SWITCHER_SERVICES = [
+  { id: 'whatsapp', label: 'WhatsApp', icon: FiSmartphone, color: '#25D366' },
+  { id: 'sms', label: 'SMS', icon: FiMessageSquare, color: '#3B82F6' },
+  { id: 'bulkmail', label: 'Mail', icon: FiMail, color: '#EF4444' },
+];
 
 const SERVICE_COLORS = {
   whatsapp: '#25D366',
@@ -78,15 +85,24 @@ const getNavItems = (service) => {
     { to: '/companies', icon: FiBriefcase, label: 'Companies', roles: ['super_admin'] },
     { to: '/recharge', icon: FiDollarSign, label: 'Recharge', roles: ['super_admin', 'admin', 'reseller'] },
     { to: '/transactions', icon: FiList, label: 'Transactions' },
+    { to: '/reports', icon: FiBarChart2, label: 'Reports' },
+    { to: '/api-keys', icon: FiKey, label: 'API Keys' },
   ];
 };
 
+const SERVICE_DASHBOARD = {
+  whatsapp: '/dashboard',
+  sms: '/sms/dashboard',
+  bulkmail: '/bulkmail/dashboard',
+};
+
 const DashboardLayout = () => {
-  const { user, logout, activeService } = useAuth();
+  const { user, logout, activeService, isImpersonating, stopImpersonation, switchService, cachedServices } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [walletBalance, setWalletBalance] = useState(null);
   const [searchMenu, setSearchMenu] = useState('');
+  const [switching, setSwitching] = useState(false);
 
   const accentColor = SERVICE_COLORS[activeService] || '#e8b931';
 
@@ -105,6 +121,30 @@ const DashboardLayout = () => {
     navigate('/login');
   };
 
+  const handleReturnToAdmin = () => {
+    stopImpersonation();
+    navigate(SERVICE_DASHBOARD[localStorage.getItem('activeService')] || '/dashboard');
+  };
+
+  const handleSwitchService = async (service) => {
+    if (service === activeService || switching) return;
+    if (isImpersonating) {
+      alert.warning('Return to admin before switching panels');
+      return;
+    }
+    setSwitching(true);
+    try {
+      const result = await switchService(service);
+      if (result.ok) {
+        navigate(SERVICE_DASHBOARD[service]);
+      } else {
+        navigate('/login', { state: { service, fromSwitcher: true } });
+      }
+    } finally {
+      setSwitching(false);
+    }
+  };
+
   const navItems = getNavItems(activeService);
 
   const filteredNav = navItems.filter(item => {
@@ -114,7 +154,27 @@ const DashboardLayout = () => {
   });
 
   return (
-    <div style={{ display: 'flex', height: '100vh', background: '#f1f5f9' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#f1f5f9' }}>
+      {isImpersonating && (
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+          padding: '8px 16px', background: '#92400e', color: 'white', fontSize: 13, fontWeight: 600, flexShrink: 0,
+        }}>
+          <FiUserCheck size={15} />
+          Viewing as {user?.name} ({user?.role?.replace('_', ' ')})
+          <button
+            onClick={handleReturnToAdmin}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6, marginLeft: 10, padding: '4px 12px',
+              background: 'rgba(255,255,255,0.15)', color: 'white', border: '1px solid rgba(255,255,255,0.3)',
+              borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 600,
+            }}
+          >
+            <FiCornerUpLeft size={13} /> Return to admin
+          </button>
+        </div>
+      )}
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
       <aside style={{
         width: sidebarOpen ? 240 : 64,
         background: '#111827',
@@ -162,6 +222,45 @@ const DashboardLayout = () => {
               {SERVICE_LABELS[activeService]}
             </div>
           )}
+        </div>
+
+        {/* Service switcher */}
+        <div style={{
+          display: 'flex', gap: sidebarOpen ? 6 : 4, padding: sidebarOpen ? '10px 12px' : '10px 8px',
+          borderBottom: '1px solid #1f2937',
+        }}>
+          {SWITCHER_SERVICES.map(s => {
+            const isActive = s.id === activeService;
+            const hasSession = cachedServices.includes(s.id);
+            return (
+              <button
+                key={s.id}
+                onClick={() => handleSwitchService(s.id)}
+                disabled={switching}
+                title={isActive ? `${s.label} (current)` : hasSession ? `Switch to ${s.label}` : `Sign in to ${s.label}`}
+                style={{
+                  position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+                  gap: 2, padding: sidebarOpen ? '8px 4px' : '6px 0',
+                  background: isActive ? `${s.color}20` : 'transparent',
+                  border: isActive ? `1px solid ${s.color}50` : '1px solid transparent',
+                  borderRadius: 8, cursor: switching ? 'default' : 'pointer',
+                  opacity: switching && !isActive ? 0.5 : 1,
+                }}
+              >
+                <s.icon size={16} color={isActive ? s.color : '#9ca3af'} />
+                {sidebarOpen && (
+                  <span style={{ fontSize: 10, fontWeight: 600, color: isActive ? s.color : '#9ca3af' }}>{s.label}</span>
+                )}
+                {!isActive && (
+                  <span style={{
+                    position: 'absolute', top: 4, right: sidebarOpen ? 8 : 2,
+                    width: 6, height: 6, borderRadius: '50%',
+                    background: hasSession ? '#22c55e' : '#4b5563',
+                  }} />
+                )}
+              </button>
+            );
+          })}
         </div>
 
         {/* Search */}
@@ -284,6 +383,7 @@ const DashboardLayout = () => {
       <main style={{ flex: 1, overflow: 'auto', background: '#f1f5f9' }}>
         <Outlet />
       </main>
+      </div>
     </div>
   );
 };

@@ -13,6 +13,7 @@ const SmsWallet = require('./SmsWallet');
 const SmsTransaction = require('./SmsTransaction');
 const SmsApiKey = require('./SmsApiKey');
 const SmsBlocklist = require('./SmsBlocklist');
+const SmsImpersonationLog = require('./SmsImpersonationLog');
 
 // Company <-> User
 SmsCompany.belongsTo(SmsUser, { as: 'owner', foreignKey: 'ownerId' });
@@ -79,6 +80,10 @@ SmsApiKey.belongsTo(SmsRoute, { foreignKey: 'routeId' });
 // Blocklist
 SmsBlocklist.belongsTo(SmsCompany, { foreignKey: 'companyId' });
 
+// Impersonation Logs
+SmsImpersonationLog.belongsTo(SmsUser, { as: 'actor', foreignKey: 'actorId' });
+SmsImpersonationLog.belongsTo(SmsUser, { as: 'target', foreignKey: 'targetUserId' });
+
 module.exports = {
   smsSequelize,
   SmsUser,
@@ -95,4 +100,5 @@ module.exports = {
   SmsTransaction,
   SmsApiKey,
   SmsBlocklist,
+  SmsImpersonationLog,
 };

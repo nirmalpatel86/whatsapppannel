@@ -17,6 +17,8 @@ import Companies from './pages/Companies';
 import Recharge from './pages/Recharge';
 import Transactions from './pages/Transactions';
 import ContactGroups from './pages/ContactGroups';
+import WhatsappApiKeys from './pages/WhatsappApiKeys';
+import WhatsappReports from './pages/WhatsappReports';
 
 // SMS pages
 import SmsDashboard from './pages/sms/SmsDashboard';
@@ -113,6 +115,8 @@ function App() {
               <PrivateRoute roles={['super_admin', 'admin', 'reseller']}><Recharge /></PrivateRoute>
             } />
             <Route path="transactions" element={<Transactions />} />
+            <Route path="reports" element={<WhatsappReports />} />
+            <Route path="api-keys" element={<WhatsappApiKeys />} />
 
             {/* SMS Routes */}
             <Route path="sms/dashboard" element={<SmsDashboard />} />

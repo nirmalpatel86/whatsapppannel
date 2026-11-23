@@ -36,6 +36,10 @@ app.use('/api/campaigns', require('./routes/campaigns'));
 app.use('/api/templates', require('./routes/templates'));
 app.use('/api/wallet', require('./routes/wallet'));
 app.use('/api/groups', require('./routes/groups'));
+app.use('/api/whatsapp/api-keys', require('./routes/whatsappApiKeys'));
+app.use('/api/whatsapp/send-message', require('./routes/whatsappSend'));
+app.use('/api/whatsapp/get-balance', require('./routes/whatsappBalance'));
+app.use('/api/whatsapp/reports', require('./routes/whatsappReports'));
 
 // SMS Routes
 app.use('/api/sms/auth', require('./routes/sms/auth'));
@@ -50,6 +54,7 @@ app.use('/api/sms/groups', require('./routes/sms/groups'));
 app.use('/api/sms/wallet', require('./routes/sms/wallet'));
 app.use('/api/sms/transactions', require('./routes/sms/transactions'));
 app.use('/api/sms/api-keys', require('./routes/sms/apiKeys'));
+app.use('/api/sms/send-message', require('./routes/sms/send'));
 
 // BulkMail Routes
 app.use('/api/bulkmail/auth', require('./routes/bulkmail/auth'));
@@ -66,6 +71,7 @@ app.use('/api/bulkmail/wallet', require('./routes/bulkmail/wallet'));
 app.use('/api/bulkmail/transactions', require('./routes/bulkmail/transactions'));
 app.use('/api/bulkmail/plans', require('./routes/bulkmail/plans'));
 app.use('/api/bulkmail/api-keys', require('./routes/bulkmail/apiKeys'));
+app.use('/api/bulkmail/send-email', require('./routes/bulkmail/send'));
 
 // WhatsApp Stats endpoint
 const { authenticate } = require('./middleware/auth');
@@ -285,6 +291,12 @@ sessionManager.setIO(io);
 const cron = require('node-cron');
 const { Campaign } = require('./models');
 const { Op } = require('sequelize');
+const { cleanupOldUploads } = require('./utils/cleanupUploads');
+
+// Delete WhatsApp chat/campaign media older than UPLOAD_RETENTION_DAYS (default 30) —
+// runs once on boot, then daily at 3 AM, so the uploads folder doesn't grow forever.
+cleanupOldUploads();
+cron.schedule('0 3 * * *', cleanupOldUploads);
 
 cron.schedule('* * * * *', async () => {
   const now = new Date();
