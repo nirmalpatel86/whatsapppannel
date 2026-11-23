@@ -340,15 +340,24 @@ const startServer = async () => {
     await bulkmailSequelize.authenticate();
     console.log('BulkMail database connected');
 
-    // Sync all databases
-    await sequelize.sync({ alter: true });
-    console.log('WhatsApp database synced');
+    // Sync all databases. Plain sync() only creates missing tables — it never touches
+    // existing ones, so it's safe no matter how many times (or how fast) the process
+    // restarts. alter:true is opt-in via DB_AUTO_ALTER for local development, where
+    // picking up new/changed model fields automatically is convenient; on a server that
+    // can crash-loop (pm2, systemd, etc.) it previously re-ran ALTER TABLE ADD UNIQUE on
+    // already-indexed columns on every single restart, piling up duplicate indexes until
+    // MySQL's 64-key-per-table limit was hit. See backend/scripts/generateSchemaSql.js to
+    // (re)create a database from the models directly instead.
+    const autoAlter = process.env.DB_AUTO_ALTER === 'true';
 
-    await smsSequelize.sync({ alter: true });
-    console.log('SMS database synced');
+    await sequelize.sync({ alter: autoAlter });
+    console.log(`WhatsApp database synced${autoAlter ? ' (alter)' : ''}`);
 
-    await bulkmailSequelize.sync({ alter: true });
-    console.log('BulkMail database synced');
+    await smsSequelize.sync({ alter: autoAlter });
+    console.log(`SMS database synced${autoAlter ? ' (alter)' : ''}`);
+
+    await bulkmailSequelize.sync({ alter: autoAlter });
+    console.log(`BulkMail database synced${autoAlter ? ' (alter)' : ''}`);
 
     // Create default WhatsApp super admin if not exists
     const waAdminExists = await User.findOne({ where: { role: 'super_admin' } });
