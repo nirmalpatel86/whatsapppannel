@@ -36,10 +36,108 @@ cd frontend
 npm install
 npm start
 ```
-Opens at http://localhost:3000
+Opens at the URL react-scripts prints (reads `PORT` from `frontend/.env`, default `3000`; this repo's local setup uses `4000` to avoid port clashes — see `frontend/.env`).
 
 ### 4. Logging In
 The login page has a service selector (WhatsApp / SMS / BulkMail). Pick a service, then sign in with that service's credentials — each service keeps its own users, wallet balance, and data, isolated in its own database.
+
+## Deploying to a Server (Production)
+
+Assumes a fresh Ubuntu/Debian VPS with a domain pointed at it. Run as a non-root user with sudo.
+
+### 1. Install prerequisites on the server
+```bash
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs mysql-server nginx git
+sudo npm install -g pm2
+```
+
+### 2. Clone the repo
+```bash
+git clone -b main https://github.com/nirmalpatel86/whatsapppannel.git
+cd whatsapppannel
+```
+(Use `-b dev` instead of `-b main` if you want to deploy the dev branch.)
+
+### 3. Set up the databases
+```bash
+sudo mysql -e "CREATE DATABASE whatsapp_panel; CREATE DATABASE sms_panel; CREATE DATABASE bulkmail_panel;"
+sudo mysql -e "CREATE USER 'panel_app'@'localhost' IDENTIFIED BY 'a_strong_password'; GRANT ALL ON whatsapp_panel.* TO 'panel_app'@'localhost'; GRANT ALL ON sms_panel.* TO 'panel_app'@'localhost'; GRANT ALL ON bulkmail_panel.* TO 'panel_app'@'localhost'; FLUSH PRIVILEGES;"
+```
+
+### 4. Configure and start the backend
+```bash
+cd backend
+cp .env.example .env
+nano .env   # set DB_USER/DB_PASSWORD (and SMS_DB_*/BULKMAIL_DB_*) to panel_app's credentials,
+            # and change JWT_SECRET to a long random string — do not use the example value in production
+npm install --production
+pm2 start server.js --name whatsapp-panel-api
+pm2 save
+pm2 startup   # follow the printed command once, so pm2 restarts the app on server reboot
+```
+The backend listens on `PORT` from `.env` (default `3001`; this repo's local setup uses `4001` to avoid port clashes). It auto-creates all tables and seeds the default super admins on first run — **log in once per service and change the `admin123` password immediately.**
+
+### 5. Build and serve the frontend
+The frontend needs to know the backend's public URL *before* building (it's baked into the static bundle):
+```bash
+cd ../frontend
+echo "REACT_APP_API_URL=https://yourdomain.com/api" > .env
+npm install
+npm run build
+```
+This produces a static `build/` folder — it is not a running server, so serve it with nginx.
+
+### 6. Nginx: serve the frontend + reverse-proxy the API
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com;
+
+    root /path/to/whatsapppannel/frontend/build;
+    index index.html;
+
+    location / {
+        try_files $uri /index.html;   # React Router needs this fallback
+    }
+
+    location /api/ {
+        proxy_pass http://localhost:3001/api/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;   # needed for the WhatsApp chat Socket.IO connection
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+
+    location /socket.io/ {
+        proxy_pass http://localhost:3001/socket.io/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+}
+```
+```bash
+sudo nano /etc/nginx/sites-available/whatsapp-panel   # paste the config above
+sudo ln -s /etc/nginx/sites-available/whatsapp-panel /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+sudo apt-get install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d yourdomain.com   # free HTTPS cert, auto-configures nginx for SSL
+```
+
+### 7. Pulling future updates
+```bash
+cd whatsapppannel
+git pull origin main
+cd backend && npm install && pm2 restart whatsapp-panel-api
+cd ../frontend && npm install && npm run build   # nginx picks up the new build/ immediately, no reload needed
+```
+
+### Useful pm2 commands
+- `pm2 logs whatsapp-panel-api` — tail backend logs
+- `pm2 restart whatsapp-panel-api` — restart after a code/env change
+- `pm2 status` — check it's running
 
 ## Architecture
 
@@ -51,6 +149,9 @@ The login page has a service selector (WhatsApp / SMS / BulkMail). Pick a servic
 | BulkMail | `bulkmail_panel` | `#EF4444` | `/api/bulkmail/*` |
 
 Each service is fully independent end to end: separate Sequelize connection, separate models, separate auth middleware, separate JWT (`service` field in the token), and separate frontend pages (`frontend/src/pages/sms/`, `frontend/src/pages/bulkmail/`). A token issued for one service is rejected by the other services' auth middleware.
+
+### WhatsApp Media Storage
+Chat/campaign attachments — both sent and received — are saved to `backend/uploads/` on local disk (served at `/uploads/*`). Incoming media is downloaded automatically for every message, so this folder grows on its own regardless of server capacity. To keep it from filling the disk, `backend/utils/cleanupUploads.js` runs once on server start and then daily at 3 AM, deleting any file older than `UPLOAD_RETENTION_DAYS` (`.env`, default 30). Raise this value if you need to keep media longer, or move to S3/R2-backed storage if you need it kept indefinitely at scale.
 
 ### Roles & Permissions (same hierarchy across all 3 services)
 | Feature | Super Admin | Reseller | User |

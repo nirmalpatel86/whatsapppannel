@@ -227,6 +227,59 @@ exports.sendNewMessage = async (req, res) => {
   }
 };
 
+exports.deleteMessage = async (req, res) => {
+  try {
+    const { messageId } = req.params;
+    const message = await Message.findByPk(messageId, { include: [{ model: Chat }] });
+    if (!message) return res.status(404).json({ error: 'Message not found' });
+
+    if (req.user.role !== 'super_admin') {
+      const visibleCompanyIds = await getVisibleCompanyIds(User, req.user);
+      if (!visibleCompanyIds.includes(message.companyId)) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+    }
+
+    await message.update({ body: '', mediaUrl: null, isDeleted: true });
+
+    if (message.Chat) {
+      const lastMessage = await Message.findOne({
+        where: { chatId: message.chatId },
+        order: [['timestamp', 'DESC']],
+      });
+      await message.Chat.update({
+        lastMessage: lastMessage ? (lastMessage.isDeleted ? 'This message was deleted' : (lastMessage.body || `[${lastMessage.type}]`)) : '',
+      });
+    }
+
+    res.json({ message: message.toJSON() });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.clearChat = async (req, res) => {
+  try {
+    const { chatId } = req.params;
+    const chat = await Chat.findByPk(chatId);
+    if (!chat) return res.status(404).json({ error: 'Chat not found' });
+
+    if (req.user.role !== 'super_admin') {
+      const visibleCompanyIds = await getVisibleCompanyIds(User, req.user);
+      if (!visibleCompanyIds.includes(chat.companyId)) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+    }
+
+    await Message.destroy({ where: { chatId } });
+    await chat.update({ lastMessage: '', unreadCount: 0 });
+
+    res.json({ message: 'Chat cleared' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 exports.sendAttachment = async (req, res) => {
   try {
     const { chatId } = req.params;

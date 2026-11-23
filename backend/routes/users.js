@@ -6,6 +6,7 @@ router.use(authenticate);
 router.get('/', authorize('super_admin', 'admin', 'reseller'), userController.list);
 router.post('/', authorize('super_admin', 'admin', 'reseller'), userController.create);
 router.put('/:id', authorize('super_admin', 'admin', 'reseller'), userController.update);
+router.post('/:id/impersonate', authorize('super_admin', 'admin', 'reseller'), userController.impersonate);
 router.delete('/:id', authorize('super_admin', 'admin', 'reseller'), userController.remove);
 
 module.exports = router;

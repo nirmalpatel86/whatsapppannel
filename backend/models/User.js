@@ -51,6 +51,10 @@ const User = sequelize.define('User', {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
+  countryCode: {
+    type: DataTypes.STRING(5),
+    defaultValue: '91',
+  },
 }, {
   timestamps: true,
   hooks: {

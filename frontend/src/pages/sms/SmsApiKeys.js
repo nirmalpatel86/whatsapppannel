@@ -2,6 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import api from '../../services/api';
 import Swal from 'sweetalert2';
 import { FiPlus, FiTrash2, FiKey, FiCopy, FiEye, FiEyeOff } from 'react-icons/fi';
+import ApiDocCard from '../../components/ApiDocCard';
+
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
 const SmsApiKeys = () => {
   const [keys, setKeys] = useState([]);
@@ -104,6 +107,21 @@ const SmsApiKeys = () => {
             <p style={{ margin: 0, fontWeight: 500, color: '#6b7280' }}>No API keys yet</p>
           </div>
         )}
+      </div>
+
+      <div style={{ marginTop: 28 }}>
+        <ApiDocCard
+          title="Send SMS API"
+          endpoint={`${API_BASE}/sms/send-message`}
+          headers={[{ key: 'Content-Type', value: 'application/json' }]}
+          parameters={[
+            { field: 'api_key', type: 'string', description: 'Your SMS API Key' },
+            { field: 'to', type: 'string', description: 'Mobile number with country code' },
+            { field: 'message', type: 'string', description: 'Text message' },
+          ]}
+          curlCode={`curl --location '${API_BASE}/sms/send-message' \\\n--header 'Content-Type: application/json' \\\n--data '{\n    "api_key": "Your API Key",\n    "to": "917862XXXXXX",\n    "message": "Text Message"\n}'`}
+          accent="#3B82F6"
+        />
       </div>
     </div>
   );

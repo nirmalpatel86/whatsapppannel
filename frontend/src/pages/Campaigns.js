@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import alert from '../utils/alert';
-import { FiPlus, FiPlay, FiPause, FiTrash2, FiUsers, FiX, FiFileText } from 'react-icons/fi';
+import { FiPlus, FiPlay, FiPause, FiTrash2, FiUsers, FiX, FiFileText, FiDownload } from 'react-icons/fi';
 
 const Campaigns = () => {
   const [campaigns, setCampaigns] = useState([]);
@@ -96,6 +96,22 @@ const Campaigns = () => {
       fetchCampaigns();
     } catch (err) {
       alert.error('Failed to pause');
+    }
+  };
+
+  const exportCsv = async (id) => {
+    try {
+      const res = await api.get(`/campaigns/${id}/export`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `campaign-${id}-report.csv`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert.error('Failed to export report');
     }
   };
 
@@ -316,6 +332,11 @@ const Campaigns = () => {
               {campaign.status === 'running' && (
                 <button onClick={() => pauseCampaign(campaign.id)} style={{ ...styles.actionBtn, color: '#f59e0b' }}>
                   <FiPause size={14} /> Pause
+                </button>
+              )}
+              {campaign.totalRecipients > 0 && (
+                <button onClick={() => exportCsv(campaign.id)} style={{ ...styles.actionBtn, color: '#3B82F6' }}>
+                  <FiDownload size={14} /> Export CSV
                 </button>
               )}
               {campaign.status !== 'running' && (

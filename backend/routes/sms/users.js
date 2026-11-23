@@ -6,6 +6,7 @@ router.use(smsAuthenticate);
 router.get('/', smsAuthorize('super_admin', 'admin', 'reseller'), smsUserController.list);
 router.post('/', smsAuthorize('super_admin', 'admin', 'reseller'), smsUserController.create);
 router.put('/:id', smsAuthorize('super_admin', 'admin', 'reseller'), smsUserController.update);
+router.post('/:id/impersonate', smsAuthorize('super_admin', 'admin', 'reseller'), smsUserController.impersonate);
 router.delete('/:id', smsAuthorize('super_admin', 'admin', 'reseller'), smsUserController.remove);
 
 module.exports = router;

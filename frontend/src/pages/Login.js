@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Swal from 'sweetalert2';
 import { FiPhone, FiLock, FiMessageSquare, FiMail, FiSmartphone } from 'react-icons/fi';
@@ -20,7 +20,8 @@ const Login = () => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [selectedService, setSelectedService] = useState('whatsapp');
+  const location = useLocation();
+  const [selectedService, setSelectedService] = useState(location.state?.service || 'whatsapp');
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -61,7 +62,11 @@ const Login = () => {
         <div style={styles.card}>
           <div style={styles.header}>
             <h1 style={styles.title}>Welcome back</h1>
-            <p style={styles.subtitle}>Select a service and sign in</p>
+            <p style={styles.subtitle}>
+              {location.state?.fromSwitcher
+                ? `Sign in once to ${activeService?.label} — after this you can switch to it instantly, no re-login needed`
+                : 'Select a service and sign in'}
+            </p>
           </div>
 
           {/* Service Selector */}

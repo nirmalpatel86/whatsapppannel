@@ -1,9 +1,12 @@
-const { User, Company } = require('../models');
+const { User, Company, ImpersonationLog } = require('../models');
 const { Op } = require('sequelize');
 const { getVisibleCompanyIds } = require('../utils/scopeHelper');
+const jwt = require('jsonwebtoken');
 
 // Roles that own their own tenant space and therefore get a dedicated Company at creation.
 const OWNS_COMPANY_ROLES = ['super_admin', 'admin', 'reseller'];
+const PHONE_REGEX = /^\d{12}$/;
+const ROLE_RANK = { super_admin: 4, admin: 3, reseller: 2, user: 1 };
 
 exports.list = async (req, res) => {
   try {
@@ -27,6 +30,9 @@ exports.create = async (req, res) => {
 
     if (!phone) {
       return res.status(400).json({ error: 'Phone number is required' });
+    }
+    if (!PHONE_REGEX.test(phone)) {
+      return res.status(400).json({ error: 'Mobile number must be exactly 12 digits (country code + number)' });
     }
 
     if (req.user.role === 'reseller' && role !== 'user') {
@@ -89,6 +95,9 @@ exports.update = async (req, res) => {
 
     const canSetRole = ['super_admin', 'admin'].includes(req.user.role);
     const { name, phone, email, isActive, role, maxWhatsappAccounts, password } = req.body;
+    if (phone && !PHONE_REGEX.test(phone)) {
+      return res.status(400).json({ error: 'Mobile number must be exactly 12 digits (country code + number)' });
+    }
     await user.update({
       ...(name && { name }),
       ...(phone && { phone }),
@@ -99,6 +108,53 @@ exports.update = async (req, res) => {
       ...(maxWhatsappAccounts !== undefined && { maxWhatsappAccounts }),
     });
     res.json({ user: user.toJSON() });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.impersonate = async (req, res) => {
+  try {
+    const target = await User.findByPk(req.params.id);
+    if (!target) return res.status(404).json({ error: 'User not found' });
+
+    const actorRank = ROLE_RANK[req.user.role] || 0;
+    const targetRank = ROLE_RANK[target.role] || 0;
+
+    if (targetRank >= actorRank) {
+      return res.status(403).json({ error: 'Cannot impersonate a user with equal or higher privileges' });
+    }
+    if (!target.isActive) {
+      return res.status(403).json({ error: 'Target account is deactivated' });
+    }
+    if (req.user.role !== 'super_admin') {
+      const visibleCompanyIds = await getVisibleCompanyIds(User, req.user);
+      if (!visibleCompanyIds.includes(target.companyId)) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+    }
+
+    await ImpersonationLog.create({
+      actorId: req.user.id,
+      actorRole: req.user.role,
+      targetUserId: target.id,
+      companyId: target.companyId,
+    });
+
+    const token = jwt.sign(
+      {
+        id: target.id,
+        role: target.role,
+        companyId: target.companyId,
+        service: 'whatsapp',
+        impersonatedBy: req.user.id,
+        impersonatorRole: req.user.role,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '2h' }
+    );
+
+    res.json({ token, user: target.toJSON() });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

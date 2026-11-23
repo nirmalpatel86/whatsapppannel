@@ -59,6 +59,10 @@ const Message = sequelize.define('Message', {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
   },
+  isDeleted: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
 }, {
   timestamps: true,
   indexes: [

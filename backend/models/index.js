@@ -11,6 +11,9 @@ const Wallet = require('./Wallet');
 const Transaction = require('./Transaction');
 const ContactGroup = require('./ContactGroup');
 const ContactGroupMember = require('./ContactGroupMember');
+const WhatsappApiKey = require('./WhatsappApiKey');
+const ConnectionLog = require('./ConnectionLog');
+const ImpersonationLog = require('./ImpersonationLog');
 
 // Company <-> User
 Company.belongsTo(User, { as: 'owner', foreignKey: 'ownerId' });
@@ -77,6 +80,20 @@ ContactGroup.hasMany(ContactGroupMember, { foreignKey: 'groupId' });
 ContactGroupMember.belongsTo(ContactGroup, { foreignKey: 'groupId' });
 ContactGroupMember.belongsTo(Contact, { foreignKey: 'contactId' });
 
+// API Keys
+WhatsappApiKey.belongsTo(User, { foreignKey: 'userId' });
+WhatsappApiKey.belongsTo(Company, { foreignKey: 'companyId' });
+WhatsappApiKey.belongsTo(WhatsappAccount, { foreignKey: 'whatsappAccountId' });
+
+// Connection Logs
+ConnectionLog.belongsTo(WhatsappAccount, { foreignKey: 'whatsappAccountId' });
+ConnectionLog.belongsTo(Company, { foreignKey: 'companyId' });
+WhatsappAccount.hasMany(ConnectionLog, { foreignKey: 'whatsappAccountId' });
+
+// Impersonation Logs
+ImpersonationLog.belongsTo(User, { as: 'actor', foreignKey: 'actorId' });
+ImpersonationLog.belongsTo(User, { as: 'target', foreignKey: 'targetUserId' });
+
 module.exports = {
   sequelize,
   User,
@@ -91,4 +108,7 @@ module.exports = {
   Transaction,
   ContactGroup,
   ContactGroupMember,
+  WhatsappApiKey,
+  ConnectionLog,
+  ImpersonationLog,
 };

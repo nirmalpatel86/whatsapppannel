@@ -30,5 +30,7 @@ router.post('/:chatId/messages', chatController.sendMessage);
 router.post('/:chatId/messages/attachment', upload.single('file'), chatController.sendAttachment);
 router.post('/send', chatController.sendNewMessage);
 router.post('/send/attachment', upload.single('file'), chatController.sendNewAttachment);
+router.delete('/messages/:messageId', chatController.deleteMessage);
+router.delete('/:chatId/messages', chatController.clearChat);
 
 module.exports = router;

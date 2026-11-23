@@ -1,4 +1,4 @@
-const { Campaign, WhatsappAccount, Contact, Message, Chat, ContactGroup, User } = require('../models');
+const { Campaign, WhatsappAccount, Contact, Message, Chat, ContactGroup, User, Transaction } = require('../models');
 const sessionManager = require('../whatsapp/sessionManager');
 const walletService = require('../services/walletService');
 const { Op } = require('sequelize');
@@ -226,6 +226,39 @@ async function runCampaign(campaignId) {
     failedCount,
   });
 }
+
+exports.exportCsv = async (req, res) => {
+  try {
+    const campaign = await Campaign.findByPk(req.params.id);
+    if (!campaign) return res.status(404).json({ error: 'Campaign not found' });
+    if (req.user.role !== 'super_admin') {
+      const visibleCompanyIds = await getVisibleCompanyIds(User, req.user);
+      if (!visibleCompanyIds.includes(campaign.companyId)) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+    }
+
+    const sentTransactions = await Transaction.findAll({
+      where: { campaignId: campaign.id },
+      attributes: ['recipientPhone', 'createdAt'],
+      raw: true,
+    });
+    const sentMap = new Map(sentTransactions.map(t => [t.recipientPhone, t.createdAt]));
+
+    const rows = [['Phone', 'Status', 'Sent At']];
+    for (const phone of campaign.recipients || []) {
+      const sentAt = sentMap.get(phone);
+      rows.push([phone, sentAt ? 'sent' : 'failed/pending', sentAt ? new Date(sentAt).toISOString() : '']);
+    }
+
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename="campaign-${campaign.id}-report.csv"`);
+    res.send(csv);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 exports.delete = async (req, res) => {
   try {
