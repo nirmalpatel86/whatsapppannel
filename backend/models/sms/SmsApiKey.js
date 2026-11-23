@@ -37,6 +37,10 @@ const SmsApiKey = smsSequelize.define('SmsApiKey', {
     type: DataTypes.BOOLEAN,
     defaultValue: true,
   },
+  lastUsedAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
 }, {
   timestamps: true,
   tableName: 'sms_api_keys',
