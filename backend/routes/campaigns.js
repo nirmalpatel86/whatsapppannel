@@ -8,6 +8,7 @@ router.get('/:id', campaignController.get);
 router.post('/', authorize('super_admin', 'admin', 'reseller', 'user'), campaignController.create);
 router.post('/:id/start', campaignController.start);
 router.post('/:id/pause', campaignController.pause);
+router.get('/:id/export', campaignController.exportCsv);
 router.delete('/:id', campaignController.delete);
 
 module.exports = router;

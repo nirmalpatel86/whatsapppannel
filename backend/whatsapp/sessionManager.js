@@ -2,7 +2,7 @@ const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, fetchLat
 const pino = require('pino');
 const path = require('path');
 const fs = require('fs');
-const { WhatsappAccount, Contact, Chat, Message } = require('../models');
+const { WhatsappAccount, Contact, Chat, Message, ConnectionLog } = require('../models');
 
 const sessions = new Map();
 let ioInstance = null;
@@ -14,6 +14,19 @@ const setIO = (io) => {
 const emitToCompany = (companyId, event, data) => {
   if (ioInstance) {
     ioInstance.to(`company_${companyId}`).emit(event, data);
+  }
+};
+
+const logConnectionEvent = async (account, event, phone) => {
+  try {
+    await ConnectionLog.create({
+      whatsappAccountId: account.id,
+      companyId: account.companyId,
+      event,
+      phone: phone || null,
+    });
+  } catch (err) {
+    console.error('Failed to log connection event:', err.message);
   }
 };
 
@@ -59,12 +72,14 @@ const createSession = async (accountId) => {
 
     if (qr) {
       await account.update({ status: 'qr_pending' });
+      logConnectionEvent(account, 'qr_pending');
       emitToCompany(account.companyId, 'qr', { accountId, qr });
     }
 
     if (connection === 'open') {
       const phone = sock.user?.id?.split(':')[0] || sock.user?.id?.split('@')[0];
       await account.update({ status: 'connected', phone });
+      logConnectionEvent(account, 'connected', phone);
       emitToCompany(account.companyId, 'connection_update', {
         accountId,
         status: 'connected',
@@ -76,6 +91,7 @@ const createSession = async (accountId) => {
       const statusCode = lastDisconnect?.error?.output?.statusCode;
       const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
       await account.update({ status: 'disconnected' });
+      logConnectionEvent(account, 'disconnected', account.phone);
       emitToCompany(account.companyId, 'connection_update', {
         accountId,
         status: 'disconnected',

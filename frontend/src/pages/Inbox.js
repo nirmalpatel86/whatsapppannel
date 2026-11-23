@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import api from '../services/api';
 import { getSocket } from '../services/socket';
 import alert from '../utils/alert';
-import { FiSend, FiSearch, FiPaperclip, FiMessageSquare, FiPhone, FiArrowDown, FiPlus, FiX, FiCheck, FiFileText, FiFile } from 'react-icons/fi';
+import { FiSend, FiSearch, FiPaperclip, FiMessageSquare, FiPhone, FiArrowDown, FiPlus, FiX, FiCheck, FiFileText, FiFile, FiTrash2, FiMoreVertical } from 'react-icons/fi';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
@@ -23,6 +23,8 @@ const Inbox = () => {
   const [showTemplates, setShowTemplates] = useState(false);
   const [templates, setTemplates] = useState([]);
   const [pendingFile, setPendingFile] = useState(null);
+  const [hoveredMsg, setHoveredMsg] = useState(null);
+  const [showChatMenu, setShowChatMenu] = useState(false);
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -101,6 +103,7 @@ const Inbox = () => {
     setSelectedChat(chat);
     setShowCompose(false);
     setShowTemplates(false);
+    setShowChatMenu(false);
     try {
       const res = await api.get(`/chats/${chat.id}/messages`);
       setMessages(res.data.messages);
@@ -162,6 +165,29 @@ const Inbox = () => {
       alert.error(err.response?.data?.error || 'Failed to send attachment');
     } finally {
       setSending(false);
+    }
+  };
+
+  const deleteMessage = async (messageId) => {
+    if (!window.confirm('Delete this message?')) return;
+    try {
+      await api.delete(`/chats/messages/${messageId}`);
+      setMessages(prev => prev.map(m => m.id === messageId ? { ...m, body: '', mediaUrl: null, isDeleted: true } : m));
+    } catch (err) {
+      alert.error('Failed to delete message');
+    }
+  };
+
+  const clearChat = async () => {
+    if (!selectedChat) return;
+    if (!window.confirm('Clear all messages in this chat? This cannot be undone.')) return;
+    try {
+      await api.delete(`/chats/${selectedChat.id}/messages`);
+      setMessages([]);
+      setChats(prev => prev.map(c => c.id === selectedChat.id ? { ...c, lastMessage: '', unreadCount: 0 } : c));
+      setShowChatMenu(false);
+    } catch (err) {
+      alert.error('Failed to clear chat');
     }
   };
 
@@ -454,6 +480,18 @@ const Inbox = () => {
                   {selectedChat.WhatsappAccount && ` · via ${selectedChat.WhatsappAccount.name}`}
                 </div>
               </div>
+              <div style={{ position: 'relative' }}>
+                <button onClick={() => setShowChatMenu(!showChatMenu)} style={styles.iconBtn} title="Chat options">
+                  <FiMoreVertical size={18} />
+                </button>
+                {showChatMenu && (
+                  <div style={styles.chatMenu}>
+                    <button onClick={clearChat} style={styles.chatMenuItem}>
+                      <FiTrash2 size={14} /> Clear chat
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div ref={messagesContainerRef} onScroll={handleScroll} style={styles.messages}>
@@ -468,15 +506,33 @@ const Inbox = () => {
                 const msg = item.data;
                 const isOutbound = msg.direction === 'outbound';
                 return (
-                  <div key={msg.id || i} style={{ ...styles.messageBubble, alignSelf: isOutbound ? 'flex-end' : 'flex-start', background: isOutbound ? '#e8b93115' : 'white', border: isOutbound ? '1px solid #e8b93130' : '1px solid #e5e7eb', borderBottomRightRadius: isOutbound ? 2 : 12, borderBottomLeftRadius: isOutbound ? 12 : 2 }}>
-                    {msg.mediaUrl && <MediaPreview msg={msg} />}
-                    {msg.type !== 'text' && !msg.mediaUrl && <div style={styles.mediaTag}>{msg.type}</div>}
-                    {msg.body && <div style={{ fontSize: 14, lineHeight: 1.5, wordBreak: 'break-word', color: '#111827' }}>{msg.body}</div>}
-                    {!msg.body && !msg.mediaUrl && <div style={{ fontSize: 14, color: '#9ca3af' }}>[{msg.type}]</div>}
-                    <div style={styles.msgMeta}>
-                      {formatTime(msg.timestamp)}
-                      {isOutbound && <StatusTicks status={msg.status} />}
+                  <div
+                    key={msg.id || i}
+                    onMouseEnter={() => setHoveredMsg(msg.id)}
+                    onMouseLeave={() => setHoveredMsg(prev => (prev === msg.id ? null : prev))}
+                    style={{ display: 'flex', alignItems: 'center', gap: 6, alignSelf: isOutbound ? 'flex-end' : 'flex-start', flexDirection: isOutbound ? 'row-reverse' : 'row' }}
+                  >
+                    <div style={{ ...styles.messageBubble, background: isOutbound ? '#e8b93115' : 'white', border: isOutbound ? '1px solid #e8b93130' : '1px solid #e5e7eb', borderBottomRightRadius: isOutbound ? 2 : 12, borderBottomLeftRadius: isOutbound ? 12 : 2 }}>
+                      {msg.isDeleted ? (
+                        <div style={{ fontSize: 13, color: '#9ca3af', fontStyle: 'italic' }}>This message was deleted</div>
+                      ) : (
+                        <>
+                          {msg.mediaUrl && <MediaPreview msg={msg} />}
+                          {msg.type !== 'text' && !msg.mediaUrl && <div style={styles.mediaTag}>{msg.type}</div>}
+                          {msg.body && <div style={{ fontSize: 14, lineHeight: 1.5, wordBreak: 'break-word', color: '#111827' }}>{msg.body}</div>}
+                          {!msg.body && !msg.mediaUrl && <div style={{ fontSize: 14, color: '#9ca3af' }}>[{msg.type}]</div>}
+                        </>
+                      )}
+                      <div style={styles.msgMeta}>
+                        {formatTime(msg.timestamp)}
+                        {isOutbound && <StatusTicks status={msg.status} />}
+                      </div>
                     </div>
+                    {isOutbound && !msg.isDeleted && hoveredMsg === msg.id && (
+                      <button onClick={() => deleteMessage(msg.id)} style={styles.msgDeleteBtn} title="Delete message">
+                        <FiTrash2 size={13} />
+                      </button>
+                    )}
                   </div>
                 );
               })}
@@ -581,6 +637,9 @@ const styles = {
   contactOption: { display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid #f9fafb' },
   miniAvatar: { width: 28, height: 28, borderRadius: '50%', background: '#374151', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 12, flexShrink: 0 },
   sendNewBtn: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 24px', background: '#e8b931', color: '#111827', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 14, width: '100%', boxShadow: '0 2px 8px rgba(232,185,49,0.25)' },
+  msgDeleteBtn: { background: 'white', border: '1px solid #e5e7eb', borderRadius: '50%', width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#ef4444', flexShrink: 0 },
+  chatMenu: { position: 'absolute', top: '100%', right: 0, marginTop: 4, background: 'white', border: '1px solid #e5e7eb', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.1)', zIndex: 20, minWidth: 150, overflow: 'hidden' },
+  chatMenuItem: { display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '10px 14px', background: 'white', border: 'none', cursor: 'pointer', fontSize: 13, color: '#ef4444', textAlign: 'left' },
 };
 
 export default Inbox;
