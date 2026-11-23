@@ -7,8 +7,9 @@ frontend/build/
 *.log
 
 # Legacy PHP projects (migrated to React/Node, kept locally for reference only)
-bulkmail/
-smsby2/
+/bulkmail/
+/smsby2/
+/wasmsapi/
 
 # Disabled nested git repo from original create-react-app scaffold (harmless leftover, not tracked)
 frontend/.git_disabled_cra_init/
