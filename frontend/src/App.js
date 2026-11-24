@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import DashboardLayout from './layouts/DashboardLayout';
@@ -71,8 +71,11 @@ const PrivateRoute = ({ children, roles }) => {
 
 const PublicRoute = ({ children }) => {
   const { user, loading, activeService } = useAuth();
+  const location = useLocation();
   if (loading) return null;
-  if (user) return <Navigate to={SERVICE_DASHBOARD[activeService] || '/dashboard'} />;
+  // Switching to a service with no cached session routes here with fromSwitcher,
+  // even while another service's session is still active — let that through.
+  if (user && !location.state?.fromSwitcher) return <Navigate to={SERVICE_DASHBOARD[activeService] || '/dashboard'} />;
   return children;
 };
 

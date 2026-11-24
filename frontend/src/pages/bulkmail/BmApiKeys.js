@@ -5,7 +5,7 @@ import { FiPlus, FiTrash2, FiKey, FiCopy, FiEye, FiEyeOff } from 'react-icons/fi
 import ApiDocCard from '../../components/ApiDocCard';
 
 const ACCENT = '#EF4444';
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:4001/api';
 
 const BmApiKeys = () => {
   const [keys, setKeys] = useState([]);

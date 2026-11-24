@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -7,7 +7,8 @@ import {
   FiHome, FiMessageSquare, FiUsers, FiSend, FiSmartphone,
   FiLogOut, FiMenu, FiFileText, FiBriefcase, FiDollarSign, FiList,
   FiFolder, FiSearch, FiMail, FiSettings, FiKey, FiBarChart2,
-  FiServer, FiHash, FiNavigation, FiGrid, FiUserCheck, FiCornerUpLeft
+  FiServer, FiHash, FiNavigation, FiGrid, FiUserCheck, FiCornerUpLeft,
+  FiChevronDown, FiCheck
 } from 'react-icons/fi';
 
 const SWITCHER_SERVICES = [
@@ -103,8 +104,21 @@ const DashboardLayout = () => {
   const [walletBalance, setWalletBalance] = useState(null);
   const [searchMenu, setSearchMenu] = useState('');
   const [switching, setSwitching] = useState(false);
+  const [switcherOpen, setSwitcherOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const switcherRef = useRef(null);
+  const userMenuRef = useRef(null);
 
   const accentColor = SERVICE_COLORS[activeService] || '#e8b931';
+
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (switcherRef.current && !switcherRef.current.contains(e.target)) setSwitcherOpen(false);
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenuOpen(false);
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
 
   useEffect(() => {
     const endpoint = SERVICE_WALLET_ENDPOINTS[activeService];
@@ -127,6 +141,7 @@ const DashboardLayout = () => {
   };
 
   const handleSwitchService = async (service) => {
+    setSwitcherOpen(false);
     if (service === activeService || switching) return;
     if (isImpersonating) {
       alert.warning('Return to admin before switching panels');
@@ -224,45 +239,6 @@ const DashboardLayout = () => {
           )}
         </div>
 
-        {/* Service switcher */}
-        <div style={{
-          display: 'flex', gap: sidebarOpen ? 6 : 4, padding: sidebarOpen ? '10px 12px' : '10px 8px',
-          borderBottom: '1px solid #1f2937',
-        }}>
-          {SWITCHER_SERVICES.map(s => {
-            const isActive = s.id === activeService;
-            const hasSession = cachedServices.includes(s.id);
-            return (
-              <button
-                key={s.id}
-                onClick={() => handleSwitchService(s.id)}
-                disabled={switching}
-                title={isActive ? `${s.label} (current)` : hasSession ? `Switch to ${s.label}` : `Sign in to ${s.label}`}
-                style={{
-                  position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
-                  gap: 2, padding: sidebarOpen ? '8px 4px' : '6px 0',
-                  background: isActive ? `${s.color}20` : 'transparent',
-                  border: isActive ? `1px solid ${s.color}50` : '1px solid transparent',
-                  borderRadius: 8, cursor: switching ? 'default' : 'pointer',
-                  opacity: switching && !isActive ? 0.5 : 1,
-                }}
-              >
-                <s.icon size={16} color={isActive ? s.color : '#9ca3af'} />
-                {sidebarOpen && (
-                  <span style={{ fontSize: 10, fontWeight: 600, color: isActive ? s.color : '#9ca3af' }}>{s.label}</span>
-                )}
-                {!isActive && (
-                  <span style={{
-                    position: 'absolute', top: 4, right: sidebarOpen ? 8 : 2,
-                    width: 6, height: 6, borderRadius: '50%',
-                    background: hasSession ? '#22c55e' : '#4b5563',
-                  }} />
-                )}
-              </button>
-            );
-          })}
-        </div>
-
         {/* Search */}
         {sidebarOpen && (
           <div style={{ padding: '12px 12px 8px' }}>
@@ -313,76 +289,170 @@ const DashboardLayout = () => {
         </nav>
 
         {/* Bottom section */}
-        <div style={{ borderTop: '1px solid #1f2937' }}>
-          {sidebarOpen && walletBalance !== null && (
-            <div style={{
-              margin: '12px 12px 0', padding: '12px',
-              background: walletBalance > 0 ? '#1f2937' : '#7f1d1d',
-              borderRadius: 10,
-              border: walletBalance > 0 ? '1px solid #374151' : '1px solid #991b1b',
-            }}>
-              <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, color: walletBalance > 0 ? '#6b7280' : '#fca5a5', marginBottom: 4 }}>
-                {walletBalance > 0 ? 'Balance' : 'Critical Balance'}
-              </div>
-              <div style={{ fontSize: 20, fontWeight: 700, color: walletBalance > 0 ? accentColor : '#fca5a5' }}>
-                {activeService === 'sms' ? `${walletBalance?.toFixed(0)} SMS` : `₹${walletBalance?.toFixed(2)}`}
-              </div>
-            </div>
-          )}
-
-          {sidebarOpen && ['super_admin', 'admin', 'reseller'].includes(user?.role) && (
-            <div style={{ padding: '8px 12px 0' }}>
-              <button
-                onClick={() => {
-                  const rechargeRoutes = { whatsapp: '/recharge', sms: '/sms/recharge', bulkmail: '/bulkmail/recharge' };
-                  navigate(rechargeRoutes[activeService]);
-                }}
-                style={{
-                  width: '100%', padding: '8px 0', background: accentColor, color: '#ffffff',
-                  border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer', fontSize: 13,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                }}
-              >
-                <FiDollarSign size={14} /> Recharge now
-              </button>
-            </div>
-          )}
-
-          {/* User profile */}
-          <div style={{ padding: '12px', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{
-              width: 34, height: 34, borderRadius: '50%', background: accentColor,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontWeight: 700, fontSize: 14, color: '#ffffff', flexShrink: 0,
-            }}>
-              {user?.name?.[0]?.toUpperCase() || 'U'}
-            </div>
-            {sidebarOpen && (
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#e5e7eb', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {user?.name}
-                </div>
-                <div style={{ fontSize: 11, color: '#6b7280', textTransform: 'capitalize' }}>
-                  {user?.role?.replace('_', ' ')}
-                </div>
-              </div>
-            )}
-            {sidebarOpen && (
-              <button
-                onClick={handleLogout}
-                style={{ background: 'none', border: 'none', color: '#6b7280', cursor: 'pointer', padding: 4 }}
-                title="Sign Out"
-              >
-                <FiLogOut size={16} />
-              </button>
-            )}
+        {sidebarOpen && ['super_admin', 'admin', 'reseller'].includes(user?.role) && (
+          <div style={{ borderTop: '1px solid #1f2937', padding: '12px 12px' }}>
+            <button
+              onClick={() => {
+                const rechargeRoutes = { whatsapp: '/recharge', sms: '/sms/recharge', bulkmail: '/bulkmail/recharge' };
+                navigate(rechargeRoutes[activeService]);
+              }}
+              style={{
+                width: '100%', padding: '8px 0', background: accentColor, color: '#ffffff',
+                border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer', fontSize: 13,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              }}
+            >
+              <FiDollarSign size={14} /> Recharge now
+            </button>
           </div>
-        </div>
+        )}
       </aside>
 
-      <main style={{ flex: 1, overflow: 'auto', background: '#f1f5f9' }}>
-        <Outlet />
-      </main>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        {/* Top header (AdminLTE-style navbar) */}
+        <header style={{
+          height: 58, background: '#ffffff', borderBottom: '1px solid #e5e7eb',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '0 18px', flexShrink: 0, position: 'relative', zIndex: 30,
+        }}>
+          {/* Left: sidebar toggle + panel switcher */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              style={{ background: 'none', border: 'none', color: '#4b5563', cursor: 'pointer', padding: 6, display: 'flex', borderRadius: 6 }}
+              title="Toggle sidebar"
+            >
+              <FiMenu size={18} />
+            </button>
+            <div style={{ width: 1, height: 22, background: '#e5e7eb' }} />
+            <div ref={switcherRef} style={{ position: 'relative' }}>
+              <button
+                onClick={() => setSwitcherOpen(o => !o)}
+                disabled={switching}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px',
+                  background: `${accentColor}14`, border: `1px solid ${accentColor}40`,
+                  borderRadius: 8, cursor: switching ? 'default' : 'pointer',
+                }}
+              >
+                {(() => {
+                  const current = SWITCHER_SERVICES.find(s => s.id === activeService);
+                  const Icon = current?.icon || FiGrid;
+                  return <Icon size={15} color={accentColor} />;
+                })()}
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>
+                  {SERVICE_LABELS[activeService]}
+                </span>
+                <FiChevronDown size={14} color="#6b7280" />
+              </button>
+              {switcherOpen && (
+                <div style={{
+                  position: 'absolute', top: 'calc(100% + 6px)', left: 0, minWidth: 220,
+                  background: '#ffffff', borderRadius: 10, border: '1px solid #e5e7eb',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)', overflow: 'hidden', padding: 6,
+                }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 0.5, padding: '6px 10px 4px' }}>
+                    Switch Panel
+                  </div>
+                  {SWITCHER_SERVICES.map(s => {
+                    const isActive = s.id === activeService;
+                    const hasSession = cachedServices.includes(s.id);
+                    return (
+                      <button
+                        key={s.id}
+                        onClick={() => handleSwitchService(s.id)}
+                        disabled={switching}
+                        style={{
+                          width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                          padding: '9px 10px', background: isActive ? `${s.color}14` : 'transparent',
+                          border: 'none', borderRadius: 8, cursor: switching ? 'default' : 'pointer', textAlign: 'left',
+                        }}
+                      >
+                        <s.icon size={16} color={s.color} />
+                        <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#111827' }}>{s.label}</span>
+                        {isActive ? (
+                          <FiCheck size={14} color={s.color} />
+                        ) : (
+                          <span style={{
+                            width: 6, height: 6, borderRadius: '50%',
+                            background: hasSession ? '#22c55e' : '#d1d5db',
+                          }} title={hasSession ? 'Signed in' : 'Not signed in'} />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right: wallet + user profile */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            {walletBalance !== null && (
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px',
+                background: walletBalance > 0 ? '#f3f4f6' : '#fef2f2',
+                border: walletBalance > 0 ? '1px solid #e5e7eb' : '1px solid #fecaca',
+                borderRadius: 8,
+              }}>
+                <FiDollarSign size={13} color={walletBalance > 0 ? accentColor : '#dc2626'} />
+                <span style={{ fontSize: 13, fontWeight: 700, color: walletBalance > 0 ? '#111827' : '#dc2626' }}>
+                  {activeService === 'sms' ? `${walletBalance?.toFixed(0)} SMS` : `₹${walletBalance?.toFixed(2)}`}
+                </span>
+              </div>
+            )}
+
+            <div ref={userMenuRef} style={{ position: 'relative' }}>
+              <button
+                onClick={() => setUserMenuOpen(o => !o)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 8, background: 'none',
+                  border: 'none', cursor: 'pointer', padding: '4px 4px 4px 4px', borderRadius: 20,
+                }}
+              >
+                <div style={{
+                  width: 32, height: 32, borderRadius: '50%', background: accentColor,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontWeight: 700, fontSize: 13, color: '#ffffff', flexShrink: 0,
+                }}>
+                  {user?.name?.[0]?.toUpperCase() || 'U'}
+                </div>
+                <FiChevronDown size={14} color="#6b7280" />
+              </button>
+              {userMenuOpen && (
+                <div style={{
+                  position: 'absolute', top: 'calc(100% + 6px)', right: 0, minWidth: 220,
+                  background: '#ffffff', borderRadius: 10, border: '1px solid #e5e7eb',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)', overflow: 'hidden',
+                }}>
+                  <div style={{ padding: '12px 14px', borderBottom: '1px solid #f3f4f6' }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {user?.name}
+                    </div>
+                    <div style={{ fontSize: 12, color: '#6b7280', textTransform: 'capitalize' }}>
+                      {user?.role?.replace('_', ' ')}
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    style={{
+                      width: '100%', display: 'flex', alignItems: 'center', gap: 8,
+                      padding: '10px 14px', background: 'none', border: 'none',
+                      cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#dc2626', textAlign: 'left',
+                    }}
+                  >
+                    <FiLogOut size={15} /> Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
+
+        <main style={{ flex: 1, overflow: 'auto', background: '#f1f5f9' }}>
+          <Outlet />
+        </main>
+      </div>
       </div>
     </div>
   );

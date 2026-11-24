@@ -4,7 +4,7 @@ import { getSocket } from '../services/socket';
 import alert from '../utils/alert';
 import { FiSend, FiSearch, FiPaperclip, FiMessageSquare, FiPhone, FiArrowDown, FiPlus, FiX, FiCheck, FiFileText, FiFile, FiTrash2, FiMoreVertical } from 'react-icons/fi';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:4001';
 
 const Inbox = () => {
   const [chats, setChats] = useState([]);

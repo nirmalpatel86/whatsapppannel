@@ -1,0 +1,24 @@
+# Reverse-proxies API/WebSocket traffic to the Node backend (localhost:4001) and falls back
+# to index.html for client-side routing. Lives in frontend/public/ so react-scripts copies it
+# into frontend/build/ on every build — no manual step needed on deploy.
+#
+# Requires mod_rewrite and mod_proxy/mod_proxy_http/mod_proxy_wstunnel enabled server-wide
+# (one-time: sudo a2enmod rewrite proxy proxy_http proxy_wstunnel && sudo systemctl reload apache2).
+# If the backend's port changes, update localhost:4001 below to match.
+
+RewriteEngine On
+
+# API
+RewriteCond %{REQUEST_URI} ^/api/
+RewriteRule ^api/(.*)$ http://localhost:4001/api/$1 [P,L]
+
+# Socket.IO (WhatsApp live chat) — WebSocket upgrade and HTTP long-polling fallback
+RewriteCond %{HTTP:Upgrade} =websocket [NC]
+RewriteRule ^socket\.io/(.*)$ ws://localhost:4001/socket.io/$1 [P,L]
+RewriteCond %{HTTP:Upgrade} !=websocket [NC]
+RewriteRule ^socket\.io/(.*)$ http://localhost:4001/socket.io/$1 [P,L]
+
+# React Router: serve index.html for any route that isn't a real file/directory
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [L]
