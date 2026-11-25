@@ -5,9 +5,9 @@ import Swal from 'sweetalert2';
 import { FiUser, FiPhone, FiLock, FiBriefcase, FiMessageSquare, FiMail, FiSmartphone } from 'react-icons/fi';
 
 const SERVICES = [
-  { id: 'whatsapp', label: 'WhatsApp', icon: FiSmartphone, color: '#25D366' },
+  { id: 'whatsapp', label: 'WhatsApp', icon: FiSmartphone, color: '#3B82F6' },
   { id: 'sms', label: 'SMS', icon: FiMessageSquare, color: '#3B82F6' },
-  { id: 'bulkmail', label: 'Bulk Mail', icon: FiMail, color: '#EF4444' },
+  { id: 'bulkmail', label: 'Bulk Mail', icon: FiMail, color: '#3B82F6' },
 ];
 
 const SERVICE_DASHBOARD = {
@@ -79,7 +79,7 @@ const Register = () => {
                 }}
               >
                 <service.icon size={18} />
-                <span style={{ fontWeight: 600, fontSize: 11 }}>{service.label}</span>
+                <span style={{ fontWeight: 600, fontSize: 13 }}>{service.label}</span>
               </button>
             ))}
           </div>
@@ -126,9 +126,9 @@ const styles = {
     alignItems: 'center', justifyContent: 'center', padding: 48,
   },
   logoWrapper: { display: 'inline-block', marginBottom: 16 },
-  logoText: { fontSize: 42, fontWeight: 800, color: '#ffffff', letterSpacing: -1 },
+  logoText: { fontSize: 44, fontWeight: 800, color: '#ffffff', letterSpacing: -1 },
   logoUnderline: { height: 4, background: '#e8b931', borderRadius: 2, marginTop: 4 },
-  tagline: { fontSize: 16, color: '#9ca3af', margin: 0, fontStyle: 'italic' },
+  tagline: { fontSize: 18, color: '#9ca3af', margin: 0, fontStyle: 'italic' },
   rightPanel: {
     flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
     background: '#f1f5f9', padding: 48,
@@ -138,30 +138,30 @@ const styles = {
     width: 460, maxWidth: '100%', boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
   },
   header: { marginBottom: 24 },
-  title: { margin: 0, color: '#111827', fontSize: 26, fontWeight: 700 },
-  subtitle: { margin: '6px 0 0', color: '#6b7280', fontSize: 14 },
+  title: { margin: 0, color: '#111827', fontSize: 28, fontWeight: 700 },
+  subtitle: { margin: '6px 0 0', color: '#6b7280', fontSize: 16 },
   serviceSelector: { display: 'flex', gap: 8, marginBottom: 20 },
   serviceBtn: {
     flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
     padding: '10px 8px', border: '2px solid #e5e7eb', borderRadius: 10,
-    cursor: 'pointer', transition: 'all 0.2s', background: '#fff', fontSize: 13,
+    cursor: 'pointer', transition: 'all 0.2s', background: '#fff', fontSize: 15,
   },
   field: { marginBottom: 16 },
-  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 13 },
+  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 15 },
   inputWrapper: {
     display: 'flex', alignItems: 'center', gap: 10, padding: '0 12px',
     border: '1px solid #e5e7eb', borderRadius: 10, background: '#f9fafb',
   },
   input: {
     flex: 1, padding: '11px 0', border: 'none', background: 'none',
-    fontSize: 14, outline: 'none', color: '#111827',
+    fontSize: 16, outline: 'none', color: '#111827',
   },
   button: {
     width: '100%', padding: 12, background: '#e8b931', color: '#ffffff',
-    border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700,
+    border: 'none', borderRadius: 10, fontSize: 17, fontWeight: 700,
     cursor: 'pointer', marginTop: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
   },
-  footer: { textAlign: 'center', marginTop: 24, color: '#6b7280', fontSize: 14 },
+  footer: { textAlign: 'center', marginTop: 24, color: '#6b7280', fontSize: 16 },
   link: { color: '#e8b931', fontWeight: 600 },
 };
 

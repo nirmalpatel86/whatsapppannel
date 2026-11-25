@@ -1,5 +1,5 @@
 -- Schema for sms_panel -- generated from Sequelize models by scripts/generateSchemaSql.js
--- Generated 2026-11-23T17:34:23.834Z
+-- Generated 2026-11-24T16:55:20.519Z
 -- Apply with: mysql -u USER -p sms_panel < database/schema/sms_panel.sql
 -- Re-run the generator (not sequelize.sync({ alter: true })) whenever models change.
 

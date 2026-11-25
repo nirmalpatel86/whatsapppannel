@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import alert from '../../utils/alert';
 import { FiPlus, FiUserCheck, FiUserX, FiUsers, FiX, FiEdit2, FiLogIn } from 'react-icons/fi';
 
-const ACCENT = '#EF4444';
+const ACCENT = '#3B82F6';
 const PHONE_REGEX = /^\d{12}$/;
 const ROLE_RANK = { super_admin: 4, admin: 3, reseller: 2, user: 1 };
 
@@ -77,8 +77,8 @@ const BmUsers = () => {
     <div style={{ padding: '24px 28px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 22, fontWeight: 700 }}>Users</h2>
-          <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>{users.length} users</p>
+          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 24, fontWeight: 700 }}>Users</h2>
+          <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>{users.length} users</p>
         </div>
         <button onClick={() => setShowCreate(true)} style={styles.primaryBtn}><FiPlus size={18} /> Add User</button>
       </div>
@@ -87,7 +87,7 @@ const BmUsers = () => {
         <div style={styles.modalOverlay} onClick={() => setShowCreate(false)}>
           <div style={styles.modal} onClick={e => e.stopPropagation()}>
             <div style={styles.modalHeader}>
-              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' }}>Add User</h3>
+              <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#111827' }}>Add User</h3>
               <button onClick={() => setShowCreate(false)} style={{ ...styles.iconBtn, padding: 6, borderRadius: 8, background: '#f3f4f6' }}><FiX size={18} /></button>
             </div>
             <div style={styles.modalBody}>
@@ -110,7 +110,7 @@ const BmUsers = () => {
         <div style={styles.modalOverlay} onClick={() => setEditUser(null)}>
           <div style={styles.modal} onClick={e => e.stopPropagation()}>
             <div style={styles.modalHeader}>
-              <div><h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' }}>Edit User</h3><p style={{ margin: '4px 0 0', fontSize: 13, color: '#6b7280' }}>{editUser.name} &middot; {editUser.phone}</p></div>
+              <div><h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#111827' }}>Edit User</h3><p style={{ margin: '4px 0 0', fontSize: 15, color: '#6b7280' }}>{editUser.name} &middot; {editUser.phone}</p></div>
               <button onClick={() => setEditUser(null)} style={{ ...styles.iconBtn, padding: 6, borderRadius: 8, background: '#f3f4f6' }}><FiX size={18} /></button>
             </div>
             <div style={styles.modalBody}>
@@ -125,8 +125,8 @@ const BmUsers = () => {
                 <div style={styles.field}><label style={styles.label}>Per Hour Limit</label><input type="number" min="1" value={editForm.perHrLimit} onChange={e => setEditForm({ ...editForm, perHrLimit: e.target.value })} style={styles.input} /></div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 0 0', borderTop: '1px solid #f3f4f6', marginTop: 8 }}>
-                <span style={{ fontSize: 12, color: '#9ca3af' }}>Status:</span>
-                <span style={{ fontSize: 12, fontWeight: 600, color: editUser.isActive ? '#22c55e' : '#ef4444' }}>{editUser.isActive ? 'Active' : 'Inactive'}</span>
+                <span style={{ fontSize: 14, color: '#9ca3af' }}>Status:</span>
+                <span style={{ fontSize: 14, fontWeight: 600, color: editUser.isActive ? '#22c55e' : '#ef4444' }}>{editUser.isActive ? 'Active' : 'Inactive'}</span>
               </div>
             </div>
             <div style={styles.modalFooter}><button onClick={() => setEditUser(null)} style={styles.secondaryBtn}>Cancel</button><button onClick={saveEdit} style={styles.primaryBtn}>Save Changes</button></div>
@@ -143,10 +143,10 @@ const BmUsers = () => {
                 <td style={styles.td}><div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><div style={styles.avatar}>{u.name?.[0]?.toUpperCase()}</div><span style={{ fontWeight: 500, color: '#111827' }}>{u.name}</span></div></td>
                 <td style={{ ...styles.td, color: '#6b7280' }}>{u.phone || '-'}</td>
                 <td style={{ ...styles.td, color: '#6b7280' }}>{u.email || '-'}</td>
-                <td style={styles.td}><span style={{ padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600, background: (roleColors[u.role] || '#6b7280') + '15', color: roleColors[u.role] || '#6b7280' }}>{u.role?.replace('_', ' ')}</span></td>
+                <td style={styles.td}><span style={{ padding: '3px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600, background: (roleColors[u.role] || '#6b7280') + '15', color: roleColors[u.role] || '#6b7280' }}>{u.role?.replace('_', ' ')}</span></td>
                 <td style={{ ...styles.td, color: '#6b7280' }}>{u.Company?.name || '-'}</td>
                 <td style={{ ...styles.td, color: '#6b7280', textAlign: 'center' }}>{u.perHrLimit || 100}</td>
-                <td style={styles.td}><span style={{ padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600, background: u.isActive ? '#22c55e20' : '#ef444420', color: u.isActive ? '#22c55e' : '#ef4444' }}>{u.isActive ? 'Active' : 'Inactive'}</span></td>
+                <td style={styles.td}><span style={{ padding: '3px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600, background: u.isActive ? '#22c55e20' : '#ef444420', color: u.isActive ? '#22c55e' : '#ef4444' }}>{u.isActive ? 'Active' : 'Inactive'}</span></td>
                 <td style={styles.td}>
                   <div style={{ display: 'flex', gap: 6 }}>
                     {u.id !== currentUser?.id && (
@@ -173,18 +173,18 @@ const BmUsers = () => {
 };
 
 const styles = {
-  primaryBtn: { display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: ACCENT, color: '#ffffff', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 14, boxShadow: '0 2px 8px rgba(239,68,68,0.25)' },
-  secondaryBtn: { padding: '10px 20px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 14 },
+  primaryBtn: { display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: ACCENT, color: '#ffffff', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 16, boxShadow: '0 2px 8px rgba(59,130,246,0.25)' },
+  secondaryBtn: { padding: '10px 20px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 16 },
   iconBtn: { background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 4 },
   field: { marginBottom: 0 },
-  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 13 },
-  input: { width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#f9fafb' },
+  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 15 },
+  input: { width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 16, outline: 'none', boxSizing: 'border-box', background: '#f9fafb' },
   tableWrapper: { background: 'white', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' },
   table: { width: '100%', borderCollapse: 'collapse' },
-  th: { textAlign: 'left', padding: '12px 16px', borderBottom: '2px solid #f3f4f6', fontSize: 11, fontWeight: 600, color: '#9ca3af', background: '#f9fafb', textTransform: 'uppercase', letterSpacing: 0.5 },
+  th: { textAlign: 'left', padding: '12px 16px', borderBottom: '2px solid #f3f4f6', fontSize: 13, fontWeight: 600, color: '#9ca3af', background: '#f9fafb', textTransform: 'uppercase', letterSpacing: 0.5 },
   tr: { borderBottom: '1px solid #f3f4f6' },
-  td: { padding: '12px 16px', fontSize: 14 },
-  avatar: { width: 32, height: 32, borderRadius: '50%', background: '#374151', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 14, flexShrink: 0 },
+  td: { padding: '12px 16px', fontSize: 16 },
+  avatar: { width: 32, height: 32, borderRadius: '50%', background: '#374151', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 16, flexShrink: 0 },
   actionBtn: { background: '#f9fafb', border: '1px solid #e5e7eb', cursor: 'pointer', padding: '6px 8px', borderRadius: 8 },
   modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' },
   modal: { background: 'white', borderRadius: 16, width: '100%', maxWidth: 520, boxShadow: '0 20px 60px rgba(0,0,0,0.15)', overflow: 'hidden' },

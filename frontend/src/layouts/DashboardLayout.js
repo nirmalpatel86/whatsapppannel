@@ -5,22 +5,22 @@ import api from '../services/api';
 import alert from '../utils/alert';
 import {
   FiHome, FiMessageSquare, FiUsers, FiSend, FiSmartphone,
-  FiLogOut, FiMenu, FiFileText, FiBriefcase, FiDollarSign, FiList,
+  FiLogOut, FiMenu, FiFileText, FiBriefcase, FiCreditCard, FiList,
   FiFolder, FiSearch, FiMail, FiSettings, FiKey, FiBarChart2,
   FiServer, FiHash, FiNavigation, FiGrid, FiUserCheck, FiCornerUpLeft,
-  FiChevronDown, FiCheck
+  FiChevronDown, FiCheck, FiUser
 } from 'react-icons/fi';
 
 const SWITCHER_SERVICES = [
-  { id: 'whatsapp', label: 'WhatsApp', icon: FiSmartphone, color: '#25D366' },
+  { id: 'whatsapp', label: 'WhatsApp', icon: FiSmartphone, color: '#3B82F6' },
   { id: 'sms', label: 'SMS', icon: FiMessageSquare, color: '#3B82F6' },
-  { id: 'bulkmail', label: 'Mail', icon: FiMail, color: '#EF4444' },
+  { id: 'bulkmail', label: 'Mail', icon: FiMail, color: '#3B82F6' },
 ];
 
 const SERVICE_COLORS = {
-  whatsapp: '#25D366',
+  whatsapp: '#3B82F6',
   sms: '#3B82F6',
-  bulkmail: '#EF4444',
+  bulkmail: '#3B82F6',
 };
 
 const SERVICE_LABELS = {
@@ -49,7 +49,7 @@ const getNavItems = (service) => {
       { to: '/sms/reports', icon: FiBarChart2, label: 'Reports' },
       { to: '/sms/users', icon: FiUsers, label: 'Users', roles: ['super_admin', 'admin', 'reseller'] },
       { to: '/sms/companies', icon: FiBriefcase, label: 'Companies', roles: ['super_admin'] },
-      { to: '/sms/recharge', icon: FiDollarSign, label: 'Recharge', roles: ['super_admin', 'admin', 'reseller'] },
+      { to: '/sms/recharge', icon: FiCreditCard, label: 'Recharge', roles: ['super_admin', 'admin', 'reseller'] },
       { to: '/sms/transactions', icon: FiList, label: 'Transactions' },
       { to: '/sms/api-keys', icon: FiKey, label: 'API Keys' },
     ];
@@ -67,7 +67,7 @@ const getNavItems = (service) => {
       { to: '/bulkmail/reports', icon: FiBarChart2, label: 'Reports' },
       { to: '/bulkmail/users', icon: FiUsers, label: 'Users', roles: ['super_admin', 'admin', 'reseller'] },
       { to: '/bulkmail/companies', icon: FiBriefcase, label: 'Companies', roles: ['super_admin'] },
-      { to: '/bulkmail/recharge', icon: FiDollarSign, label: 'Recharge', roles: ['super_admin', 'admin', 'reseller'] },
+      { to: '/bulkmail/recharge', icon: FiCreditCard, label: 'Recharge', roles: ['super_admin', 'admin', 'reseller'] },
       { to: '/bulkmail/transactions', icon: FiList, label: 'Transactions' },
       { to: '/bulkmail/plans', icon: FiSettings, label: 'Plans', roles: ['super_admin', 'admin'] },
       { to: '/bulkmail/api-keys', icon: FiKey, label: 'API Keys' },
@@ -84,7 +84,7 @@ const getNavItems = (service) => {
     { to: '/templates', icon: FiFileText, label: 'Templates', roles: ['super_admin', 'admin', 'reseller'] },
     { to: '/users', icon: FiUsers, label: 'Users', roles: ['super_admin', 'admin', 'reseller'] },
     { to: '/companies', icon: FiBriefcase, label: 'Companies', roles: ['super_admin'] },
-    { to: '/recharge', icon: FiDollarSign, label: 'Recharge', roles: ['super_admin', 'admin', 'reseller'] },
+    { to: '/recharge', icon: FiCreditCard, label: 'Recharge', roles: ['super_admin', 'admin', 'reseller'] },
     { to: '/transactions', icon: FiList, label: 'Transactions' },
     { to: '/reports', icon: FiBarChart2, label: 'Reports' },
     { to: '/api-keys', icon: FiKey, label: 'API Keys' },
@@ -173,7 +173,7 @@ const DashboardLayout = () => {
       {isImpersonating && (
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-          padding: '8px 16px', background: '#92400e', color: 'white', fontSize: 13, fontWeight: 600, flexShrink: 0,
+          padding: '8px 16px', background: '#92400e', color: 'white', fontSize: 15, fontWeight: 600, flexShrink: 0,
         }}>
           <FiUserCheck size={15} />
           Viewing as {user?.name} ({user?.role?.replace('_', ' ')})
@@ -182,7 +182,7 @@ const DashboardLayout = () => {
             style={{
               display: 'flex', alignItems: 'center', gap: 6, marginLeft: 10, padding: '4px 12px',
               background: 'rgba(255,255,255,0.15)', color: 'white', border: '1px solid rgba(255,255,255,0.3)',
-              borderRadius: 8, cursor: 'pointer', fontSize: 12, fontWeight: 600,
+              borderRadius: 8, cursor: 'pointer', fontSize: 14, fontWeight: 600,
             }}
           >
             <FiCornerUpLeft size={13} /> Return to admin
@@ -211,14 +211,14 @@ const DashboardLayout = () => {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: sidebarOpen ? 'space-between' : 'center' }}>
             {sidebarOpen && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
-                <span style={{ fontSize: 22, fontWeight: 800, color: '#ffffff', letterSpacing: -0.5 }}>
+                <span style={{ fontSize: 24, fontWeight: 800, color: '#ffffff', letterSpacing: -0.5 }}>
                   Leadofy
                 </span>
                 <div style={{ width: 60, height: 3, background: accentColor, borderRadius: 2, position: 'relative', top: 12, left: -60 }} />
               </div>
             )}
             {!sidebarOpen && (
-              <span style={{ fontSize: 20, fontWeight: 800, color: accentColor }}>L</span>
+              <span style={{ fontSize: 22, fontWeight: 800, color: accentColor }}>L</span>
             )}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -231,7 +231,7 @@ const DashboardLayout = () => {
             <div style={{
               marginTop: 8, padding: '4px 10px', borderRadius: 6,
               background: `${accentColor}20`, color: accentColor,
-              fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5,
+              fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5,
               display: 'inline-block', alignSelf: 'flex-start',
             }}>
               {SERVICE_LABELS[activeService]}
@@ -254,7 +254,7 @@ const DashboardLayout = () => {
                 placeholder="Search menu..."
                 style={{
                   flex: 1, background: 'none', border: 'none', outline: 'none',
-                  color: '#d1d5db', fontSize: 13,
+                  color: '#d1d5db', fontSize: 15,
                 }}
               />
             </div>
@@ -278,7 +278,7 @@ const DashboardLayout = () => {
                 borderLeft: isActive ? `3px solid ${accentColor}` : '3px solid transparent',
                 gap: 12,
                 transition: 'all 0.15s ease',
-                fontSize: 13,
+                fontSize: 15,
                 fontWeight: isActive ? 600 : 400,
               })}
             >
@@ -298,11 +298,11 @@ const DashboardLayout = () => {
               }}
               style={{
                 width: '100%', padding: '8px 0', background: accentColor, color: '#ffffff',
-                border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer', fontSize: 13,
+                border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer', fontSize: 15,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
               }}
             >
-              <FiDollarSign size={14} /> Recharge now
+              <FiCreditCard size={14} /> Recharge now
             </button>
           </div>
         )}
@@ -340,7 +340,7 @@ const DashboardLayout = () => {
                   const Icon = current?.icon || FiGrid;
                   return <Icon size={15} color={accentColor} />;
                 })()}
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>
+                <span style={{ fontSize: 15, fontWeight: 600, color: '#111827' }}>
                   {SERVICE_LABELS[activeService]}
                 </span>
                 <FiChevronDown size={14} color="#6b7280" />
@@ -351,7 +351,7 @@ const DashboardLayout = () => {
                   background: '#ffffff', borderRadius: 10, border: '1px solid #e5e7eb',
                   boxShadow: '0 8px 24px rgba(0,0,0,0.12)', overflow: 'hidden', padding: 6,
                 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 0.5, padding: '6px 10px 4px' }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 0.5, padding: '6px 10px 4px' }}>
                     Switch Panel
                   </div>
                   {SWITCHER_SERVICES.map(s => {
@@ -369,7 +369,7 @@ const DashboardLayout = () => {
                         }}
                       >
                         <s.icon size={16} color={s.color} />
-                        <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#111827' }}>{s.label}</span>
+                        <span style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#111827' }}>{s.label}</span>
                         {isActive ? (
                           <FiCheck size={14} color={s.color} />
                         ) : (
@@ -395,28 +395,34 @@ const DashboardLayout = () => {
                 border: walletBalance > 0 ? '1px solid #e5e7eb' : '1px solid #fecaca',
                 borderRadius: 8,
               }}>
-                <FiDollarSign size={13} color={walletBalance > 0 ? accentColor : '#dc2626'} />
-                <span style={{ fontSize: 13, fontWeight: 700, color: walletBalance > 0 ? '#111827' : '#dc2626' }}>
+                <FiCreditCard size={13} color={walletBalance > 0 ? accentColor : '#dc2626'} />
+                <span style={{ fontSize: 15, fontWeight: 700, color: walletBalance > 0 ? '#111827' : '#dc2626' }}>
                   {activeService === 'sms' ? `${walletBalance?.toFixed(0)} SMS` : `₹${walletBalance?.toFixed(2)}`}
                 </span>
               </div>
             )}
 
-            <div ref={userMenuRef} style={{ position: 'relative' }}>
+            <div ref={userMenuRef} style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 2 }}>
               <button
-                onClick={() => setUserMenuOpen(o => !o)}
+                onClick={() => navigate('/profile')}
+                title="My Profile"
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 8, background: 'none',
-                  border: 'none', cursor: 'pointer', padding: '4px 4px 4px 4px', borderRadius: 20,
+                  display: 'flex', alignItems: 'center', background: 'none',
+                  border: 'none', cursor: 'pointer', padding: 4, borderRadius: '50%',
                 }}
               >
                 <div style={{
                   width: 32, height: 32, borderRadius: '50%', background: accentColor,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontWeight: 700, fontSize: 13, color: '#ffffff', flexShrink: 0,
+                  fontWeight: 700, fontSize: 15, color: '#ffffff', flexShrink: 0,
                 }}>
                   {user?.name?.[0]?.toUpperCase() || 'U'}
                 </div>
+              </button>
+              <button
+                onClick={() => setUserMenuOpen(o => !o)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex' }}
+              >
                 <FiChevronDown size={14} color="#6b7280" />
               </button>
               {userMenuOpen && (
@@ -426,19 +432,30 @@ const DashboardLayout = () => {
                   boxShadow: '0 8px 24px rgba(0,0,0,0.12)', overflow: 'hidden',
                 }}>
                   <div style={{ padding: '12px 14px', borderBottom: '1px solid #f3f4f6' }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {user?.name}
                     </div>
-                    <div style={{ fontSize: 12, color: '#6b7280', textTransform: 'capitalize' }}>
+                    <div style={{ fontSize: 14, color: '#6b7280', textTransform: 'capitalize' }}>
                       {user?.role?.replace('_', ' ')}
                     </div>
                   </div>
+                  <button
+                    onClick={() => { setUserMenuOpen(false); navigate('/profile'); }}
+                    style={{
+                      width: '100%', display: 'flex', alignItems: 'center', gap: 8,
+                      padding: '10px 14px', background: 'none', border: 'none',
+                      cursor: 'pointer', fontSize: 15, fontWeight: 600, color: '#111827', textAlign: 'left',
+                    }}
+                  >
+                    <FiUser size={15} /> My Profile
+                  </button>
                   <button
                     onClick={handleLogout}
                     style={{
                       width: '100%', display: 'flex', alignItems: 'center', gap: 8,
                       padding: '10px 14px', background: 'none', border: 'none',
-                      cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#dc2626', textAlign: 'left',
+                      cursor: 'pointer', fontSize: 15, fontWeight: 600, color: '#dc2626', textAlign: 'left',
+                      borderTop: '1px solid #f3f4f6',
                     }}
                   >
                     <FiLogOut size={15} /> Sign Out

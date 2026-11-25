@@ -156,8 +156,8 @@ const Campaigns = () => {
     <div style={{ padding: '24px 28px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 22, fontWeight: 700 }}>Campaigns</h2>
-          <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>{campaigns.length} campaigns</p>
+          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 24, fontWeight: 700 }}>Campaigns</h2>
+          <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>{campaigns.length} campaigns</p>
         </div>
         <button onClick={() => setShowCreate(true)} style={styles.primaryBtn}>
           <FiPlus size={18} /> New Campaign
@@ -167,7 +167,7 @@ const Campaigns = () => {
       {showCreate && (
         <div style={styles.createPanel}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#111827' }}>Create Campaign</h3>
+            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: '#111827' }}>Create Campaign</h3>
             <button onClick={() => setShowCreate(false)} style={styles.iconBtn}><FiX size={18} /></button>
           </div>
 
@@ -213,14 +213,14 @@ const Campaigns = () => {
                       templateName: tpl.name,
                     }))}
                     style={{
-                      padding: '8px 14px', borderRadius: 8, fontSize: 13, cursor: 'pointer',
+                      padding: '8px 14px', borderRadius: 8, fontSize: 15, cursor: 'pointer',
                       border: form.templateName === tpl.name ? '2px solid #e8b931' : '1px solid #e5e7eb',
                       background: form.templateName === tpl.name ? '#e8b93115' : '#f9fafb',
                       color: '#111827', fontWeight: form.templateName === tpl.name ? 600 : 400,
                     }}
                   >
                     {tpl.name}
-                    <span style={{ fontSize: 11, color: '#9ca3af', marginLeft: 6 }}>{tpl.category}</span>
+                    <span style={{ fontSize: 13, color: '#9ca3af', marginLeft: 6 }}>{tpl.category}</span>
                   </button>
                 ))}
               </div>
@@ -251,8 +251,8 @@ const Campaigns = () => {
                   >
                     <div style={styles.groupChipIcon}><FiUsers size={14} /></div>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: 13, color: '#111827' }}>{g.name}</div>
-                      <div style={{ fontSize: 11, color: '#9ca3af' }}>{g.memberCount} contacts</div>
+                      <div style={{ fontWeight: 600, fontSize: 15, color: '#111827' }}>{g.name}</div>
+                      <div style={{ fontSize: 13, color: '#9ca3af' }}>{g.memberCount} contacts</div>
                     </div>
                   </div>
                 ))}
@@ -292,13 +292,13 @@ const Campaigns = () => {
           <div key={campaign.id} style={styles.card}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
-                <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 600, color: '#111827' }}>{campaign.name}</h3>
-                <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>
+                <h3 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 600, color: '#111827' }}>{campaign.name}</h3>
+                <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>
                   {campaign.WhatsappAccount?.name || 'N/A'} · {campaign.type} · {campaign.totalRecipients} recipients
                 </p>
               </div>
               <span style={{
-                padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                padding: '4px 12px', borderRadius: 20, fontSize: 14, fontWeight: 600,
                 background: (statusColors[campaign.status] || '#6b7280') + '15',
                 color: statusColors[campaign.status] || '#6b7280',
               }}>
@@ -308,7 +308,7 @@ const Campaigns = () => {
 
             {(campaign.status === 'running' || campaign.status === 'completed' || campaign.status === 'paused') && (
               <div style={{ marginTop: 14 }}>
-                <div style={{ display: 'flex', gap: 24, fontSize: 13, color: '#6b7280' }}>
+                <div style={{ display: 'flex', gap: 24, fontSize: 15, color: '#6b7280' }}>
                   <span>Sent: <strong style={{ color: '#22c55e' }}>{campaign.sentCount}</strong></span>
                   <span>Failed: <strong style={{ color: '#ef4444' }}>{campaign.failedCount}</strong></span>
                   <span>Remaining: <strong>{campaign.totalRecipients - campaign.sentCount - campaign.failedCount}</strong></span>
@@ -353,7 +353,7 @@ const Campaigns = () => {
         <div style={{ textAlign: 'center', padding: 60, color: '#9ca3af' }}>
           <FiPlus size={40} style={{ opacity: 0.3, marginBottom: 8 }} />
           <h3 style={{ color: '#6b7280', margin: '0 0 8px' }}>No campaigns yet</h3>
-          <p style={{ margin: 0, fontSize: 14 }}>Create a campaign to send bulk messages.</p>
+          <p style={{ margin: 0, fontSize: 16 }}>Create a campaign to send bulk messages.</p>
         </div>
       )}
     </div>
@@ -364,15 +364,15 @@ const styles = {
   primaryBtn: {
     display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px',
     background: '#e8b931', color: '#111827', border: 'none', borderRadius: 10,
-    fontWeight: 600, cursor: 'pointer', fontSize: 14, boxShadow: '0 2px 8px rgba(232,185,49,0.25)',
+    fontWeight: 600, cursor: 'pointer', fontSize: 16, boxShadow: '0 2px 8px rgba(232,185,49,0.25)',
   },
   secondaryBtn: {
     padding: '10px 20px', background: '#f3f4f6', color: '#374151',
-    border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 14,
+    border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 16,
   },
   linkBtn: {
     background: 'none', border: 'none', color: '#e8b931',
-    cursor: 'pointer', fontSize: 13, fontWeight: 600,
+    cursor: 'pointer', fontSize: 15, fontWeight: 600,
   },
   iconBtn: { background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 4 },
   createPanel: {
@@ -383,10 +383,10 @@ const styles = {
     display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16, marginBottom: 16,
   },
   field: { marginBottom: 14 },
-  label: { display: 'flex', alignItems: 'center', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 13 },
+  label: { display: 'flex', alignItems: 'center', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 15 },
   input: {
     width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb',
-    borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#f9fafb',
+    borderRadius: 10, fontSize: 16, outline: 'none', boxSizing: 'border-box', background: '#f9fafb',
   },
   groupGrid: {
     display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 8,
@@ -407,7 +407,7 @@ const styles = {
   actionBtn: {
     display: 'flex', alignItems: 'center', gap: 4, padding: '6px 14px',
     background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8,
-    cursor: 'pointer', fontSize: 13, fontWeight: 500,
+    cursor: 'pointer', fontSize: 15, fontWeight: 500,
   },
   progressBar: {
     marginTop: 8, height: 6, background: '#f3f4f6', borderRadius: 4, overflow: 'hidden',

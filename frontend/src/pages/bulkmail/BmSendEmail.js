@@ -3,7 +3,7 @@ import api from '../../services/api';
 import alert from '../../utils/alert';
 import { FiSend, FiUsers, FiMail, FiFileText } from 'react-icons/fi';
 
-const ACCENT = '#EF4444';
+const ACCENT = '#3B82F6';
 
 const BmSendEmail = () => {
   const [senders, setSenders] = useState([]);
@@ -71,8 +71,8 @@ const BmSendEmail = () => {
   return (
     <div style={{ padding: '24px 28px' }}>
       <div style={{ marginBottom: 24 }}>
-        <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 22, fontWeight: 700 }}>Send Email</h2>
-        <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>Compose and send emails to your contacts</p>
+        <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 24, fontWeight: 700 }}>Send Email</h2>
+        <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>Compose and send emails to your contacts</p>
       </div>
 
       <div style={styles.panel}>
@@ -108,7 +108,7 @@ const BmSendEmail = () => {
                 type="button"
                 onClick={() => toggleGroup(g.id)}
                 style={{
-                  padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 500,
+                  padding: '6px 14px', borderRadius: 20, fontSize: 15, fontWeight: 500,
                   border: form.groupIds.includes(g.id) ? `2px solid ${ACCENT}` : '2px solid #e5e7eb',
                   background: form.groupIds.includes(g.id) ? `${ACCENT}10` : 'white',
                   color: form.groupIds.includes(g.id) ? ACCENT : '#374151',
@@ -118,7 +118,7 @@ const BmSendEmail = () => {
                 {g.name} ({g.memberCount || 0})
               </button>
             ))}
-            {groups.length === 0 && <span style={{ color: '#9ca3af', fontSize: 13 }}>No groups available</span>}
+            {groups.length === 0 && <span style={{ color: '#9ca3af', fontSize: 15 }}>No groups available</span>}
           </div>
         </div>
 
@@ -137,7 +137,7 @@ const BmSendEmail = () => {
           <textarea
             value={form.body}
             onChange={e => setForm({ ...form, body: e.target.value })}
-            style={{ ...styles.input, minHeight: 200, resize: 'vertical', fontFamily: 'monospace', fontSize: 13 }}
+            style={{ ...styles.input, minHeight: 200, resize: 'vertical', fontFamily: 'monospace', fontSize: 15 }}
             placeholder="<h1>Hello!</h1><p>Your email content here...</p>"
           />
         </div>
@@ -159,16 +159,16 @@ const styles = {
     display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16, marginBottom: 16,
   },
   field: { marginBottom: 16 },
-  label: { display: 'flex', alignItems: 'center', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 13 },
+  label: { display: 'flex', alignItems: 'center', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 15 },
   input: {
     width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb',
-    borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#f9fafb',
+    borderRadius: 10, fontSize: 16, outline: 'none', boxSizing: 'border-box', background: '#f9fafb',
   },
   primaryBtn: {
     display: 'flex', alignItems: 'center', gap: 8, padding: '12px 24px',
     background: ACCENT, color: '#ffffff', border: 'none', borderRadius: 10,
-    fontWeight: 600, cursor: 'pointer', fontSize: 15,
-    boxShadow: '0 2px 8px rgba(239,68,68,0.25)',
+    fontWeight: 600, cursor: 'pointer', fontSize: 17,
+    boxShadow: '0 2px 8px rgba(59,130,246,0.25)',
   },
 };
 

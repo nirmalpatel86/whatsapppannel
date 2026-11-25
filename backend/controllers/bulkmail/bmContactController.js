@@ -195,3 +195,22 @@ exports.remove = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.bulkDelete = async (req, res) => {
+  try {
+    const { ids } = req.body;
+    if (!ids || !ids.length) return res.status(400).json({ error: 'No contact IDs provided' });
+
+    const companyFilter = req.user.role === 'super_admin'
+      ? (req.body.companyId || req.user.companyId)
+      : { [Op.in]: await getVisibleCompanyIds(BmUser, req.user) };
+
+    const deleted = await BmContact.destroy({
+      where: { id: { [Op.in]: ids }, companyId: companyFilter },
+    });
+
+    res.json({ message: `${deleted} contacts deleted`, deleted });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

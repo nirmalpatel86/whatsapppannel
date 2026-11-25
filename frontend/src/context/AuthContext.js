@@ -77,6 +77,17 @@ export const AuthProvider = ({ children }) => {
     return loggedInUser;
   };
 
+  const updateProfile = async (updates) => {
+    const prefix = SERVICE_API_PREFIX[activeService];
+    const res = await api.put(`${prefix}/me`, updates);
+    const updatedUser = res.data.user;
+    const token = localStorage.getItem('token');
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    saveSession(activeService, token, updatedUser);
+    return updatedUser;
+  };
+
   const register = async (name, phone, password, companyName, service = 'whatsapp') => {
     const prefix = SERVICE_API_PREFIX[service];
     const res = await api.post(`${prefix}/register`, { name, phone, password, companyName });
@@ -176,7 +187,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{
-      user, login, register, logout, loading, activeService, setActiveService,
+      user, login, register, logout, loading, activeService, setActiveService, updateProfile,
       impersonate, stopImpersonation, isImpersonating,
       switchService, cachedServices,
     }}>

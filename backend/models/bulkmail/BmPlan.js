@@ -23,6 +23,10 @@ const BmPlan = bulkmailSequelize.define('BmPlan', {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false,
   },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
   isActive: {
     type: DataTypes.BOOLEAN,
     defaultValue: true,

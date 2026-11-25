@@ -3,7 +3,7 @@ import api from '../../services/api';
 import alert from '../../utils/alert';
 import { FiPlus, FiX, FiEdit2, FiTrash2, FiPackage } from 'react-icons/fi';
 
-const ACCENT = '#EF4444';
+const ACCENT = '#3B82F6';
 
 const BmPlans = () => {
   const [plans, setPlans] = useState([]);
@@ -69,27 +69,26 @@ const BmPlans = () => {
     <div style={{ padding: '24px 28px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 22, fontWeight: 700 }}>Email Plans</h2>
-          <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>{plans.length} plans</p>
+          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 24, fontWeight: 700 }}>Email Plans</h2>
+          <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>{plans.length} plans</p>
         </div>
         <button onClick={() => setShowCreate(true)} style={styles.primaryBtn}><FiPlus size={18} /> New Plan</button>
       </div>
 
       {showCreate && (
-        <div style={styles.createPanel}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#111827' }}>Create Plan</h3>
-            <button onClick={() => setShowCreate(false)} style={styles.iconBtn}><FiX size={16} /></button>
+        <div style={styles.modalOverlay} onClick={() => setShowCreate(false)}>
+          <div style={styles.modal} onClick={e => e.stopPropagation()}>
+            <div style={styles.modalHeader}><h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#111827' }}>Create Plan</h3><button onClick={() => setShowCreate(false)} style={{ ...styles.iconBtn, padding: 6, borderRadius: 8, background: '#f3f4f6' }}><FiX size={18} /></button></div>
+            <div style={{ padding: '20px 24px' }}>{renderForm(form, setForm)}</div>
+            <div style={styles.modalFooter}><button onClick={() => setShowCreate(false)} style={styles.secondaryBtn}>Cancel</button><button onClick={createPlan} style={styles.primaryBtn}>Create Plan</button></div>
           </div>
-          {renderForm(form, setForm)}
-          <div style={{ display: 'flex', gap: 12 }}><button onClick={createPlan} style={styles.primaryBtn}>Create Plan</button><button onClick={() => setShowCreate(false)} style={styles.secondaryBtn}>Cancel</button></div>
         </div>
       )}
 
       {editPlan && (
         <div style={styles.modalOverlay} onClick={() => setEditPlan(null)}>
           <div style={styles.modal} onClick={e => e.stopPropagation()}>
-            <div style={styles.modalHeader}><h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' }}>Edit Plan</h3><button onClick={() => setEditPlan(null)} style={{ ...styles.iconBtn, padding: 6, borderRadius: 8, background: '#f3f4f6' }}><FiX size={18} /></button></div>
+            <div style={styles.modalHeader}><h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#111827' }}>Edit Plan</h3><button onClick={() => setEditPlan(null)} style={{ ...styles.iconBtn, padding: 6, borderRadius: 8, background: '#f3f4f6' }}><FiX size={18} /></button></div>
             <div style={{ padding: '20px 24px' }}>{renderForm(editForm, setEditForm)}</div>
             <div style={styles.modalFooter}><button onClick={() => setEditPlan(null)} style={styles.secondaryBtn}>Cancel</button><button onClick={saveEdit} style={styles.primaryBtn}>Save Changes</button></div>
           </div>
@@ -103,25 +102,25 @@ const BmPlans = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={styles.planIcon}><FiPackage size={18} /></div>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: 16, color: '#111827' }}>{p.name}</div>
-                  {p.description && <div style={{ fontSize: 12, color: '#9ca3af' }}>{p.description}</div>}
+                  <div style={{ fontWeight: 700, fontSize: 18, color: '#111827' }}>{p.name}</div>
+                  {p.description && <div style={{ fontSize: 14, color: '#9ca3af' }}>{p.description}</div>}
                 </div>
               </div>
-              <span style={{ padding: '3px 10px', borderRadius: 12, fontSize: 11, fontWeight: 600, background: p.isActive !== false ? '#22c55e20' : '#ef444420', color: p.isActive !== false ? '#22c55e' : '#ef4444' }}>{p.isActive !== false ? 'Active' : 'Inactive'}</span>
+              <span style={{ padding: '3px 10px', borderRadius: 12, fontSize: 13, fontWeight: 600, background: p.isActive !== false ? '#22c55e20' : '#ef444420', color: p.isActive !== false ? '#22c55e' : '#ef4444' }}>{p.isActive !== false ? 'Active' : 'Inactive'}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 12 }}>
               <div>
-                <div style={{ fontSize: 28, fontWeight: 800, color: ACCENT }}>₹{parseFloat(p.price).toFixed(0)}</div>
-                <div style={{ fontSize: 12, color: '#6b7280' }}>{p.validityDays} days validity</div>
+                <div style={{ fontSize: 30, fontWeight: 800, color: ACCENT }}>₹{parseFloat(p.price).toFixed(0)}</div>
+                <div style={{ fontSize: 14, color: '#6b7280' }}>{p.validityDays} days validity</div>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: 20, fontWeight: 700, color: '#374151' }}>{(p.emailCount || 0).toLocaleString()}</div>
-                <div style={{ fontSize: 12, color: '#6b7280' }}>emails</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: '#374151' }}>{(p.emailCount || 0).toLocaleString()}</div>
+                <div style={{ fontSize: 14, color: '#6b7280' }}>emails</div>
               </div>
             </div>
             <div style={{ display: 'flex', gap: 6, borderTop: '1px solid #f3f4f6', paddingTop: 12 }}>
               <button onClick={() => openEdit(p)} style={styles.actionBtn}><FiEdit2 size={14} color="#2563eb" /></button>
-              <button onClick={() => toggleActive(p.id, p.isActive !== false)} style={{ ...styles.actionBtn, fontSize: 11, padding: '4px 10px' }}>{p.isActive !== false ? 'Deactivate' : 'Activate'}</button>
+              <button onClick={() => toggleActive(p.id, p.isActive !== false)} style={{ ...styles.actionBtn, fontSize: 13, padding: '4px 10px' }}>{p.isActive !== false ? 'Deactivate' : 'Activate'}</button>
               <button onClick={() => deletePlan(p.id)} style={styles.actionBtn}><FiTrash2 size={14} color="#ef4444" /></button>
             </div>
           </div>
@@ -132,7 +131,7 @@ const BmPlans = () => {
         <div style={{ textAlign: 'center', padding: 60, color: '#9ca3af' }}>
           <FiPackage size={48} style={{ opacity: 0.3, marginBottom: 12 }} />
           <h3 style={{ color: '#6b7280', margin: '0 0 8px' }}>No plans yet</h3>
-          <p style={{ margin: 0, fontSize: 14 }}>Create email plans for your users.</p>
+          <p style={{ margin: 0, fontSize: 16 }}>Create email plans for your users.</p>
         </div>
       )}
     </div>
@@ -140,14 +139,14 @@ const BmPlans = () => {
 };
 
 const styles = {
-  primaryBtn: { display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: ACCENT, color: '#ffffff', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 14, boxShadow: '0 2px 8px rgba(239,68,68,0.25)' },
-  secondaryBtn: { padding: '10px 20px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 14 },
+  primaryBtn: { display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: ACCENT, color: '#ffffff', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 16, boxShadow: '0 2px 8px rgba(59,130,246,0.25)' },
+  secondaryBtn: { padding: '10px 20px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 16 },
   iconBtn: { background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 4 },
   createPanel: { background: 'white', borderRadius: 14, padding: 24, marginBottom: 24, boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' },
   formGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 16 },
   field: { marginBottom: 0 },
-  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 13 },
-  input: { width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#f9fafb' },
+  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 15 },
+  input: { width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 16, outline: 'none', boxSizing: 'border-box', background: '#f9fafb' },
   card: { background: 'white', borderRadius: 14, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' },
   planIcon: { width: 42, height: 42, borderRadius: 10, background: `${ACCENT}12`, color: ACCENT, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   actionBtn: { background: '#f9fafb', border: '1px solid #e5e7eb', cursor: 'pointer', padding: '6px 8px', borderRadius: 8 },

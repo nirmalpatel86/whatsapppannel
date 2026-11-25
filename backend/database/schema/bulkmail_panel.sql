@@ -1,5 +1,5 @@
 -- Schema for bulkmail_panel -- generated from Sequelize models by scripts/generateSchemaSql.js
--- Generated 2026-11-23T17:34:27.206Z
+-- Generated 2026-11-24T16:24:44.598Z
 -- Apply with: mysql -u USER -p bulkmail_panel < database/schema/bulkmail_panel.sql
 -- Re-run the generator (not sequelize.sync({ alter: true })) whenever models change.
 
@@ -8,9 +8,9 @@ USE `bulkmail_panel`;
 
 CREATE TABLE IF NOT EXISTS `bm_users` (`id` INTEGER auto_increment , `name` VARCHAR(255) NOT NULL, `phone` VARCHAR(255) NOT NULL UNIQUE, `email` VARCHAR(255), `password` VARCHAR(255) NOT NULL, `role` ENUM('super_admin', 'admin', 'reseller', 'user') DEFAULT 'user', `companyId` INTEGER, `parentId` INTEGER, `isActive` TINYINT(1) DEFAULT true, `maxUsers` INTEGER DEFAULT 0, `businessName` VARCHAR(255), `businessEmail` VARCHAR(255), `brand` VARCHAR(255), `logo` VARCHAR(255), `billingAddress` TEXT, `perHrLimit` INTEGER DEFAULT 100, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS `bm_companies` (`id` INTEGER auto_increment , `name` VARCHAR(255) NOT NULL, `ownerId` INTEGER NOT NULL, `plan` ENUM('free', 'basic', 'pro', 'enterprise') DEFAULT 'free', `isActive` TINYINT(1) DEFAULT true, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS `bm_companies` (`id` INTEGER auto_increment , `name` VARCHAR(255) NOT NULL, `ownerId` INTEGER NOT NULL, `plan` ENUM('free', 'basic', 'pro', 'enterprise') DEFAULT 'free', `maxCampaignsPerDay` INTEGER DEFAULT 5, `isActive` TINYINT(1) DEFAULT true, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS `bm_smtp_servers` (`id` INTEGER auto_increment , `companyId` INTEGER NOT NULL, `name` VARCHAR(255) NOT NULL, `host` VARCHAR(255) NOT NULL, `port` INTEGER NOT NULL DEFAULT 587, `username` VARCHAR(255) NOT NULL, `password` VARCHAR(255) NOT NULL, `secure` ENUM('none', 'ssl', 'tls') DEFAULT 'tls', `isActive` TINYINT(1) DEFAULT true, `maxPerHour` INTEGER DEFAULT 100, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS `bm_smtp_servers` (`id` INTEGER auto_increment , `companyId` INTEGER NOT NULL, `name` VARCHAR(255) NOT NULL, `host` VARCHAR(255) NOT NULL, `port` INTEGER NOT NULL DEFAULT 587, `username` VARCHAR(255) NOT NULL, `password` VARCHAR(255) NOT NULL, `secure` ENUM('none', 'ssl', 'tls') DEFAULT 'tls', `userId` VARCHAR(255), `type` ENUM('sendgrid', 'sendclean', 'general') DEFAULT 'general', `isActive` TINYINT(1) DEFAULT true, `maxPerHour` INTEGER DEFAULT 100, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS `bm_senders` (`id` INTEGER auto_increment , `companyId` INTEGER NOT NULL, `name` VARCHAR(255) NOT NULL, `email` VARCHAR(255) NOT NULL, `replyName` VARCHAR(255), `replyEmail` VARCHAR(255), `smtpId` INTEGER, `senderGroupId` INTEGER, `isActive` TINYINT(1) DEFAULT true, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB;
 
@@ -50,7 +50,7 @@ ALTER TABLE `bm_transactions` ADD INDEX `bm_transactions_type` (`type`);
 
 ALTER TABLE `bm_transactions` ADD INDEX `bm_transactions_created_at` (`createdAt`);
 
-CREATE TABLE IF NOT EXISTS `bm_plans` (`id` INTEGER auto_increment , `name` VARCHAR(255) NOT NULL, `emailCount` INTEGER NOT NULL, `validityDays` INTEGER NOT NULL, `price` DECIMAL(10,2) NOT NULL, `isActive` TINYINT(1) DEFAULT true, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS `bm_plans` (`id` INTEGER auto_increment , `name` VARCHAR(255) NOT NULL, `emailCount` INTEGER NOT NULL, `validityDays` INTEGER NOT NULL, `price` DECIMAL(10,2) NOT NULL, `description` TEXT, `isActive` TINYINT(1) DEFAULT true, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS `bm_api_keys` (`id` INTEGER auto_increment , `userId` INTEGER NOT NULL, `companyId` INTEGER NOT NULL, `name` VARCHAR(255) NOT NULL, `apiKey` VARCHAR(64) NOT NULL UNIQUE, `senderId` INTEGER, `isActive` TINYINT(1) DEFAULT true, `lastUsedAt` DATETIME, `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL, PRIMARY KEY (`id`)) ENGINE=InnoDB;
 
@@ -100,6 +100,8 @@ ALTER TABLE `bm_companies` ADD FOREIGN KEY (`ownerId`) REFERENCES `bm_users` (`i
 
 ALTER TABLE `bm_companies` CHANGE `plan` `plan` ENUM('free', 'basic', 'pro', 'enterprise') DEFAULT 'free';
 
+ALTER TABLE `bm_companies` CHANGE `maxCampaignsPerDay` `maxCampaignsPerDay` INTEGER DEFAULT 5;
+
 ALTER TABLE `bm_companies` CHANGE `isActive` `isActive` TINYINT(1) DEFAULT true;
 
 ALTER TABLE `bm_companies` CHANGE `createdAt` `createdAt` DATETIME NOT NULL;
@@ -119,6 +121,10 @@ ALTER TABLE `bm_smtp_servers` CHANGE `username` `username` VARCHAR(255) NOT NULL
 ALTER TABLE `bm_smtp_servers` CHANGE `password` `password` VARCHAR(255) NOT NULL;
 
 ALTER TABLE `bm_smtp_servers` CHANGE `secure` `secure` ENUM('none', 'ssl', 'tls') DEFAULT 'tls';
+
+ALTER TABLE `bm_smtp_servers` CHANGE `userId` `userId` VARCHAR(255);
+
+ALTER TABLE `bm_smtp_servers` CHANGE `type` `type` ENUM('sendgrid', 'sendclean', 'general') DEFAULT 'general';
 
 ALTER TABLE `bm_smtp_servers` CHANGE `isActive` `isActive` TINYINT(1) DEFAULT true;
 
@@ -337,6 +343,8 @@ ALTER TABLE `bm_plans` CHANGE `emailCount` `emailCount` INTEGER NOT NULL;
 ALTER TABLE `bm_plans` CHANGE `validityDays` `validityDays` INTEGER NOT NULL;
 
 ALTER TABLE `bm_plans` CHANGE `price` `price` DECIMAL(10,2) NOT NULL;
+
+ALTER TABLE `bm_plans` CHANGE `description` `description` TEXT;
 
 ALTER TABLE `bm_plans` CHANGE `isActive` `isActive` TINYINT(1) DEFAULT true;
 

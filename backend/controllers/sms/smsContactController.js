@@ -60,7 +60,7 @@ exports.create = async (req, res) => {
       ? (req.body.companyId || req.user.companyId)
       : req.user.companyId;
 
-    const { name, phone, email, state, city, address } = req.body;
+    const { name, phone, email, state, city, address, isDnd } = req.body;
     if (!phone) return res.status(400).json({ error: 'Phone number is required' });
 
     const existing = await SmsContact.findOne({ where: { companyId, phone } });
@@ -68,6 +68,7 @@ exports.create = async (req, res) => {
 
     const contact = await SmsContact.create({
       companyId, phone, name: name || phone, email, state, city, address,
+      isDnd: isDnd || false,
     });
     res.status(201).json({ contact });
   } catch (err) {

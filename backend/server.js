@@ -1,7 +1,22 @@
 require('dotenv').config();
+
+// A guessable/missing JWT secret lets anyone forge a valid token for any user
+// (including super_admin) across all three panels — refuse to boot with one.
+const WEAK_JWT_SECRETS = new Set([
+  'whatsapp_panel_secret_key_change_in_production',
+  'your_jwt_secret_change_this',
+]);
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32 || WEAK_JWT_SECRETS.has(process.env.JWT_SECRET)) {
+  console.error('Refusing to start: JWT_SECRET is missing, a known placeholder, or too short (needs 32+ chars).');
+  console.error('Generate one with: node -e "console.log(require(\'crypto\').randomBytes(48).toString(\'hex\'))"');
+  process.exit(1);
+}
+
 const express = require('express');
 const http = require('http');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const { Server } = require('socket.io');
 const path = require('path');
 const { sequelize, User, Company, Wallet } = require('./models');
@@ -20,7 +35,30 @@ const io = new Server(server, {
 });
 
 // Middleware
-app.use(cors());
+app.use(helmet({
+  // This is a JSON API (not an HTML app), and a CSP tuned for that would need
+  // per-route exceptions for the uploads dir and the unsubscribe landing page;
+  // skip it rather than risk silently breaking either.
+  contentSecurityPolicy: false,
+  // Frontend and backend run on different ports/origins, so uploaded media
+  // (chat attachments, etc.) must stay loadable cross-origin.
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
+// Bearer-token auth (no cookies) means CORS mainly matters for limiting which
+// sites' browser-side JS can call the API directly. Defaults to allow-all to
+// avoid breaking existing deployments; set CORS_ORIGIN (comma-separated) to
+// lock it down once production frontend origin(s) are known.
+const corsOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
+  : true;
+app.use(cors({ origin: corsOrigins }));
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 2000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests, please slow down.' },
+}));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -69,9 +107,11 @@ app.use('/api/bulkmail/contacts', require('./routes/bulkmail/contacts'));
 app.use('/api/bulkmail/contact-groups', require('./routes/bulkmail/contactGroups'));
 app.use('/api/bulkmail/wallet', require('./routes/bulkmail/wallet'));
 app.use('/api/bulkmail/transactions', require('./routes/bulkmail/transactions'));
+app.use('/api/bulkmail/reports', require('./routes/bulkmail/reports'));
 app.use('/api/bulkmail/plans', require('./routes/bulkmail/plans'));
 app.use('/api/bulkmail/api-keys', require('./routes/bulkmail/apiKeys'));
 app.use('/api/bulkmail/send-email', require('./routes/bulkmail/send'));
+app.use('/api/bulkmail/send', require('./routes/bulkmail/quickSend'));
 
 // WhatsApp Stats endpoint
 const { authenticate } = require('./middleware/auth');
@@ -153,6 +193,7 @@ app.get('/api/stats', authenticate, async (req, res) => {
 // SMS Stats endpoint
 const { smsAuthenticate } = require('./middleware/smsAuth');
 const { SmsCampaign, SmsCampaignMessage, SmsContact, SmsTemplate } = require('./models/sms');
+const { runSmsCampaign } = require('./controllers/sms/smsCampaignController');
 
 app.get('/api/sms/stats', smsAuthenticate, async (req, res) => {
   try {
@@ -202,6 +243,7 @@ app.get('/api/sms/stats', smsAuthenticate, async (req, res) => {
 // BulkMail Stats endpoint
 const { bmAuthenticate } = require('./middleware/bmAuth');
 const { BmCampaign, BmCampaignEmail, BmContact, BmTemplate, BmSender } = require('./models/bulkmail');
+const { runEmailCampaign } = require('./controllers/bulkmail/bmCampaignController');
 
 app.get('/api/bulkmail/stats', bmAuthenticate, async (req, res) => {
   try {
@@ -314,6 +356,7 @@ cron.schedule('* * * * *', async () => {
   });
   for (const campaign of smsCampaigns) {
     await campaign.update({ status: 'running', startedAt: new Date() });
+    runSmsCampaign(campaign.id).catch(console.error);
   }
 
   // BulkMail campaigns
@@ -322,6 +365,7 @@ cron.schedule('* * * * *', async () => {
   });
   for (const campaign of bmCampaigns) {
     await campaign.update({ status: 'running', startedAt: new Date() });
+    runEmailCampaign(campaign.id).catch(console.error);
   }
 });
 

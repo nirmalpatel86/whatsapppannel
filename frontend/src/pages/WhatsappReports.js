@@ -87,8 +87,8 @@ const WhatsappReports = () => {
   return (
     <div style={{ padding: '24px 28px' }}>
       <div style={{ marginBottom: 24 }}>
-        <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 22, fontWeight: 700 }}>Reports</h2>
-        <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>Usage and delivery reports (last 30 days)</p>
+        <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 24, fontWeight: 700 }}>Reports</h2>
+        <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>Usage and delivery reports (last 30 days)</p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 14, marginBottom: 24 }}>
@@ -100,14 +100,14 @@ const WhatsappReports = () => {
           { label: 'Failed', value: summary.failed, color: '#ef4444' },
         ].map(s => (
           <div key={s.label} style={styles.statCard}>
-            <div style={{ fontSize: 12, color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>{s.label}</div>
-            <div style={{ fontSize: 24, fontWeight: 700, color: s.color, marginTop: 6 }}>{s.value}</div>
+            <div style={{ fontSize: 14, color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>{s.label}</div>
+            <div style={{ fontSize: 26, fontWeight: 700, color: s.color, marginTop: 6 }}>{s.value}</div>
           </div>
         ))}
       </div>
 
       <div style={{ ...styles.card, marginBottom: 20 }}>
-        <h3 style={{ margin: '0 0 14px', fontSize: 15, fontWeight: 600, color: '#111827' }}>Daily Usage</h3>
+        <h3 style={{ margin: '0 0 14px', fontSize: 17, fontWeight: 600, color: '#111827' }}>Daily Usage</h3>
         <div style={{ overflowX: 'auto' }}>
           <table style={styles.table}>
             <thead>
@@ -141,7 +141,7 @@ const WhatsappReports = () => {
 
       <div style={{ ...styles.card, marginBottom: 20 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, flexWrap: 'wrap', gap: 10 }}>
-          <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#111827' }}>Connection History</h3>
+          <h3 style={{ margin: 0, fontSize: 17, fontWeight: 600, color: '#111827' }}>Connection History</h3>
           <select value={connAccountFilter} onChange={e => setConnAccountFilter(e.target.value)} style={styles.filterInput}>
             <option value="">All Accounts</option>
             {accounts.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
@@ -164,12 +164,12 @@ const WhatsappReports = () => {
                   <tr key={l.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
                     <td style={styles.td}>{l.WhatsappAccount?.name || '-'}</td>
                     <td style={styles.td}>
-                      <span style={{ padding: '2px 10px', borderRadius: 12, fontSize: 11, fontWeight: 600, background: cc.bg, color: cc.color }}>
+                      <span style={{ padding: '2px 10px', borderRadius: 12, fontSize: 13, fontWeight: 600, background: cc.bg, color: cc.color }}>
                         {l.event.replace('_', ' ')}
                       </span>
                     </td>
                     <td style={styles.td}>{l.phone || '-'}</td>
-                    <td style={{ ...styles.td, fontSize: 12, color: '#9ca3af' }}>{new Date(l.createdAt).toLocaleString('en-IN')}</td>
+                    <td style={{ ...styles.td, fontSize: 14, color: '#9ca3af' }}>{new Date(l.createdAt).toLocaleString('en-IN')}</td>
                   </tr>
                 );
               })}
@@ -183,7 +183,7 @@ const WhatsappReports = () => {
 
       <div style={styles.card}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, flexWrap: 'wrap', gap: 10 }}>
-          <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#111827' }}>Delivery Report</h3>
+          <h3 style={{ margin: 0, fontSize: 17, fontWeight: 600, color: '#111827' }}>Delivery Report</h3>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <select value={filters.whatsappAccountId} onChange={e => setFilters({ ...filters, whatsappAccountId: e.target.value })} style={styles.filterInput}>
               <option value="">All Accounts</option>
@@ -232,11 +232,11 @@ const WhatsappReports = () => {
                     <td style={styles.td}>{m.direction}</td>
                     <td style={styles.td}>{m.type}</td>
                     <td style={styles.td}>
-                      <span style={{ padding: '2px 10px', borderRadius: 12, fontSize: 11, fontWeight: 600, background: sc.bg, color: sc.color }}>
+                      <span style={{ padding: '2px 10px', borderRadius: 12, fontSize: 13, fontWeight: 600, background: sc.bg, color: sc.color }}>
                         {m.status}
                       </span>
                     </td>
-                    <td style={{ ...styles.td, fontSize: 12, color: '#9ca3af' }}>{new Date(m.timestamp).toLocaleString('en-IN')}</td>
+                    <td style={{ ...styles.td, fontSize: 14, color: '#9ca3af' }}>{new Date(m.timestamp).toLocaleString('en-IN')}</td>
                   </tr>
                 );
               })}
@@ -252,7 +252,7 @@ const WhatsappReports = () => {
         {totalPages > 1 && (
           <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 16 }}>
             <button disabled={page <= 1} onClick={() => fetchDelivery(page - 1)} style={styles.pageBtn}>Prev</button>
-            <span style={{ fontSize: 13, color: '#6b7280', padding: '6px 10px' }}>Page {page} of {totalPages} ({total} total)</span>
+            <span style={{ fontSize: 15, color: '#6b7280', padding: '6px 10px' }}>Page {page} of {totalPages} ({total} total)</span>
             <button disabled={page >= totalPages} onClick={() => fetchDelivery(page + 1)} style={styles.pageBtn}>Next</button>
           </div>
         )}
@@ -265,10 +265,10 @@ const styles = {
   card: { background: 'white', borderRadius: 14, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' },
   statCard: { background: 'white', borderRadius: 14, padding: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' },
   table: { width: '100%', borderCollapse: 'collapse' },
-  th: { textAlign: 'left', padding: '10px 12px', borderBottom: '2px solid #f3f4f6', fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 0.5, whiteSpace: 'nowrap' },
-  td: { padding: '10px 12px', fontSize: 13, color: '#374151', whiteSpace: 'nowrap' },
-  filterInput: { padding: '7px 10px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 13, outline: 'none', background: '#f9fafb' },
-  pageBtn: { padding: '6px 14px', border: '1px solid #e5e7eb', borderRadius: 8, background: 'white', cursor: 'pointer', fontSize: 13 },
+  th: { textAlign: 'left', padding: '10px 12px', borderBottom: '2px solid #f3f4f6', fontSize: 13, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 0.5, whiteSpace: 'nowrap' },
+  td: { padding: '10px 12px', fontSize: 15, color: '#374151', whiteSpace: 'nowrap' },
+  filterInput: { padding: '7px 10px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 15, outline: 'none', background: '#f9fafb' },
+  pageBtn: { padding: '6px 14px', border: '1px solid #e5e7eb', borderRadius: 8, background: 'white', cursor: 'pointer', fontSize: 15 },
 };
 
 export default WhatsappReports;

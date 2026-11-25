@@ -3,7 +3,7 @@ import api from '../../services/api';
 import alert from '../../utils/alert';
 import { FiBarChart2, FiMail, FiEye, FiMousePointer, FiAlertCircle, FiFilter, FiDownload } from 'react-icons/fi';
 
-const ACCENT = '#EF4444';
+const ACCENT = '#3B82F6';
 
 const BmReports = () => {
   const [report, setReport] = useState(null);
@@ -44,8 +44,8 @@ const BmReports = () => {
     <div style={{ padding: '24px 28px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 22, fontWeight: 700 }}>Reports & Analytics</h2>
-          <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>Email campaign performance overview</p>
+          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 24, fontWeight: 700 }}>Reports & Analytics</h2>
+          <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>Email campaign performance overview</p>
         </div>
         <button onClick={exportCsv} style={styles.outlineBtn}><FiDownload size={15} /> Export CSV</button>
       </div>
@@ -73,7 +73,7 @@ const BmReports = () => {
       </div>
 
       <div style={styles.tableWrapper}>
-        <h3 style={{ margin: '0 0 12px', padding: '16px 16px 0', fontSize: 15, fontWeight: 600, color: '#111827' }}>Campaign Performance</h3>
+        <h3 style={{ margin: '0 0 12px', padding: '16px 16px 0', fontSize: 17, fontWeight: 600, color: '#111827' }}>Campaign Performance</h3>
         <table style={styles.table}>
           <thead>
             <tr>
@@ -104,7 +104,7 @@ const BmReports = () => {
                       <div style={{ flex: 1, height: 6, background: '#f3f4f6', borderRadius: 3, overflow: 'hidden' }}>
                         <div style={{ width: `${Math.min(parseFloat(openRate), 100)}%`, height: '100%', background: '#3b82f6', borderRadius: 3 }} />
                       </div>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: '#374151', minWidth: 40 }}>{openRate}%</span>
+                      <span style={{ fontSize: 14, fontWeight: 600, color: '#374151', minWidth: 40 }}>{openRate}%</span>
                     </div>
                   </td>
                   <td style={styles.td}>
@@ -112,7 +112,7 @@ const BmReports = () => {
                       <div style={{ flex: 1, height: 6, background: '#f3f4f6', borderRadius: 3, overflow: 'hidden' }}>
                         <div style={{ width: `${Math.min(parseFloat(clickRate), 100)}%`, height: '100%', background: '#8b5cf6', borderRadius: 3 }} />
                       </div>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: '#374151', minWidth: 40 }}>{clickRate}%</span>
+                      <span style={{ fontSize: 14, fontWeight: 600, color: '#374151', minWidth: 40 }}>{clickRate}%</span>
                     </div>
                   </td>
                 </tr>
@@ -135,22 +135,22 @@ const StatBox = ({ icon: Icon, label, value, color }) => (
   <div style={{ background: 'white', borderRadius: 14, padding: '18px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
       <Icon size={16} color={color} />
-      <span style={{ fontSize: 11, color: '#9ca3af', fontWeight: 500, textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</span>
+      <span style={{ fontSize: 13, color: '#9ca3af', fontWeight: 500, textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</span>
     </div>
-    <div style={{ fontSize: 24, fontWeight: 700, color }}>{value}</div>
+    <div style={{ fontSize: 26, fontWeight: 700, color }}>{value}</div>
   </div>
 );
 
 const styles = {
-  outlineBtn: { display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 14 },
+  outlineBtn: { display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 16 },
   filterBar: { display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center', background: 'white', borderRadius: 14, padding: '12px 16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)', marginBottom: 20, border: '1px solid #e5e7eb' },
-  filterSelect: { padding: '7px 12px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 13, outline: 'none', background: '#f9fafb' },
-  clearBtn: { padding: '7px 14px', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8, cursor: 'pointer', fontSize: 13, color: ACCENT, fontWeight: 600 },
+  filterSelect: { padding: '7px 12px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 15, outline: 'none', background: '#f9fafb' },
+  clearBtn: { padding: '7px 14px', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8, cursor: 'pointer', fontSize: 15, color: ACCENT, fontWeight: 600 },
   tableWrapper: { background: 'white', borderRadius: 14, overflow: 'auto', boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' },
   table: { width: '100%', borderCollapse: 'collapse', minWidth: 700 },
-  th: { textAlign: 'left', padding: '10px 14px', borderBottom: '2px solid #f3f4f6', fontSize: 11, fontWeight: 600, color: '#9ca3af', background: '#f9fafb', whiteSpace: 'nowrap', textTransform: 'uppercase', letterSpacing: 0.5 },
+  th: { textAlign: 'left', padding: '10px 14px', borderBottom: '2px solid #f3f4f6', fontSize: 13, fontWeight: 600, color: '#9ca3af', background: '#f9fafb', whiteSpace: 'nowrap', textTransform: 'uppercase', letterSpacing: 0.5 },
   tr: { borderBottom: '1px solid #f3f4f6' },
-  td: { padding: '10px 14px', fontSize: 13, color: '#374151' },
+  td: { padding: '10px 14px', fontSize: 15, color: '#374151' },
 };
 
 export default BmReports;

@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import DashboardLayout from './layouts/DashboardLayout';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Profile from './pages/Profile';
 
 // WhatsApp pages
 import Dashboard from './pages/Dashboard';
@@ -41,6 +42,7 @@ import BmDashboard from './pages/bulkmail/BmDashboard';
 import BmSendEmail from './pages/bulkmail/BmSendEmail';
 import BmCampaigns from './pages/bulkmail/BmCampaigns';
 import BmTemplates from './pages/bulkmail/BmTemplates';
+import BmTemplateForm from './pages/bulkmail/BmTemplateForm';
 import BmSenders from './pages/bulkmail/BmSenders';
 import BmSmtp from './pages/bulkmail/BmSmtp';
 import BmContacts from './pages/bulkmail/BmContacts';
@@ -95,6 +97,7 @@ function App() {
 
           <Route path="/" element={<PrivateRoute><DashboardLayout /></PrivateRoute>}>
             <Route index element={<DefaultRedirect />} />
+            <Route path="profile" element={<Profile />} />
 
             {/* WhatsApp Routes */}
             <Route path="dashboard" element={<Dashboard />} />
@@ -155,6 +158,12 @@ function App() {
             <Route path="bulkmail/campaigns" element={<BmCampaigns />} />
             <Route path="bulkmail/templates" element={
               <PrivateRoute roles={['super_admin', 'admin', 'reseller']}><BmTemplates /></PrivateRoute>
+            } />
+            <Route path="bulkmail/templates/new" element={
+              <PrivateRoute roles={['super_admin', 'admin', 'reseller']}><BmTemplateForm /></PrivateRoute>
+            } />
+            <Route path="bulkmail/templates/:id/edit" element={
+              <PrivateRoute roles={['super_admin', 'admin', 'reseller']}><BmTemplateForm /></PrivateRoute>
             } />
             <Route path="bulkmail/senders" element={
               <PrivateRoute roles={['super_admin', 'admin', 'reseller']}><BmSenders /></PrivateRoute>

@@ -59,8 +59,8 @@ const Templates = () => {
     <div style={{ padding: '24px 28px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 22, fontWeight: 700 }}>Message Templates</h2>
-          <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>Prepare templates for Meta Cloud API approval</p>
+          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 24, fontWeight: 700 }}>Message Templates</h2>
+          <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>Prepare templates for Meta Cloud API approval</p>
         </div>
         <button onClick={() => setShowCreate(true)} style={styles.primaryBtn}>
           <FiPlus size={18} /> New Template
@@ -70,7 +70,7 @@ const Templates = () => {
       {showCreate && (
         <div style={styles.createPanel}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#111827' }}>Create Template</h3>
+            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: '#111827' }}>Create Template</h3>
             <button onClick={() => setShowCreate(false)} style={styles.iconBtn}><FiX size={16} /></button>
           </div>
           <div style={styles.formGrid}>
@@ -120,23 +120,23 @@ const Templates = () => {
         {templates.map(tpl => (
           <div key={tpl.id} style={styles.card}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <h3 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 600, color: '#111827' }}>{tpl.name}</h3>
+              <h3 style={{ margin: '0 0 4px', fontSize: 17, fontWeight: 600, color: '#111827' }}>{tpl.name}</h3>
               <span style={{
-                padding: '4px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600,
+                padding: '4px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600,
                 background: (statusColors[tpl.status] || '#6b7280') + '20',
                 color: statusColors[tpl.status] || '#6b7280',
               }}>
                 {tpl.status}
               </span>
             </div>
-            <div style={{ fontSize: 12, color: '#9ca3af', marginBottom: 8 }}>
+            <div style={{ fontSize: 14, color: '#9ca3af', marginBottom: 8 }}>
               {tpl.category} | {tpl.language}
             </div>
-            {tpl.header && <div style={{ fontWeight: 600, marginBottom: 4, color: '#111827', fontSize: 14 }}>{tpl.header}</div>}
-            <div style={{ fontSize: 14, background: '#f9fafb', padding: 12, borderRadius: 10, marginBottom: 8, color: '#374151', border: '1px solid #f3f4f6' }}>
+            {tpl.header && <div style={{ fontWeight: 600, marginBottom: 4, color: '#111827', fontSize: 16 }}>{tpl.header}</div>}
+            <div style={{ fontSize: 16, background: '#f9fafb', padding: 12, borderRadius: 10, marginBottom: 8, color: '#374151', border: '1px solid #f3f4f6' }}>
               {tpl.body}
             </div>
-            {tpl.footer && <div style={{ fontSize: 12, color: '#9ca3af' }}>{tpl.footer}</div>}
+            {tpl.footer && <div style={{ fontSize: 14, color: '#9ca3af' }}>{tpl.footer}</div>}
             <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
               <button onClick={() => deleteTemplate(tpl.id)} style={{ ...styles.actionBtn, color: '#ef4444' }}>
                 <FiTrash2 size={14} /> Delete
@@ -150,7 +150,7 @@ const Templates = () => {
         <div style={{ textAlign: 'center', padding: 60, color: '#9ca3af' }}>
           <FiFileText size={48} style={{ opacity: 0.3, marginBottom: 12 }} />
           <h3 style={{ color: '#6b7280', margin: '0 0 8px' }}>No templates yet</h3>
-          <p style={{ margin: 0, fontSize: 14 }}>Create templates for Meta Cloud API campaigns.</p>
+          <p style={{ margin: 0, fontSize: 16 }}>Create templates for Meta Cloud API campaigns.</p>
         </div>
       )}
     </div>
@@ -161,11 +161,11 @@ const styles = {
   primaryBtn: {
     display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px',
     background: '#e8b931', color: '#111827', border: 'none', borderRadius: 10,
-    fontWeight: 600, cursor: 'pointer', fontSize: 14, boxShadow: '0 2px 8px rgba(232,185,49,0.25)',
+    fontWeight: 600, cursor: 'pointer', fontSize: 16, boxShadow: '0 2px 8px rgba(232,185,49,0.25)',
   },
   secondaryBtn: {
     padding: '10px 20px', background: '#f3f4f6', color: '#374151',
-    border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 14,
+    border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 16,
   },
   iconBtn: { background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 4 },
   createPanel: {
@@ -176,10 +176,10 @@ const styles = {
     display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 16,
   },
   field: { marginBottom: 12 },
-  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 13 },
+  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 15 },
   input: {
     width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb',
-    borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#f9fafb',
+    borderRadius: 10, fontSize: 16, outline: 'none', boxSizing: 'border-box', background: '#f9fafb',
   },
   card: {
     background: 'white', borderRadius: 14, padding: 20,
@@ -188,7 +188,7 @@ const styles = {
   actionBtn: {
     display: 'flex', alignItems: 'center', gap: 4, padding: '6px 12px',
     background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8,
-    cursor: 'pointer', fontSize: 13,
+    cursor: 'pointer', fontSize: 15,
   },
 };
 

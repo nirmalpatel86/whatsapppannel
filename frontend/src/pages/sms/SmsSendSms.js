@@ -71,7 +71,7 @@ const SmsSendSms = () => {
     }
     setSending(true);
     try {
-      await api.post('/sms/campaigns', {
+      const res = await api.post('/sms/campaigns', {
         name: `Quick Send ${new Date().toLocaleString('en-IN')}`,
         recipients: numbers,
         message: form.message,
@@ -82,7 +82,14 @@ const SmsSendSms = () => {
         entityId: form.entityId || undefined,
         messageType: form.isUnicode ? 'unicode' : form.messageType,
       });
-      Swal.fire({ icon: 'success', title: 'Campaign Created', text: `${numbers.length} recipients, ${totalSms} total SMS`, timer: 2000, showConfirmButton: false });
+
+      try {
+        await api.post(`/sms/campaigns/${res.data.campaign.id}/start`);
+        Swal.fire({ icon: 'success', title: 'Sending started', text: `${numbers.length} recipients, ${totalSms} total SMS`, timer: 2000, showConfirmButton: false });
+      } catch (startErr) {
+        Swal.fire({ icon: 'warning', title: 'Saved but not sent', text: startErr.response?.data?.error || 'Could not start sending' });
+      }
+
       setForm({ numbers: '', message: '', senderIdId: '', routeId: '', templateId: '', dltContentId: '', entityId: '', isUnicode: false, messageType: 'text' });
     } catch (err) {
       Swal.fire({ icon: 'error', title: 'Error', text: err.response?.data?.error || 'Failed to send' });
@@ -94,13 +101,13 @@ const SmsSendSms = () => {
   return (
     <div style={{ padding: '24px 28px' }}>
       <div style={{ marginBottom: 24 }}>
-        <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 22, fontWeight: 700 }}>Send SMS</h2>
-        <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>Send quick SMS to one or multiple numbers</p>
+        <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 24, fontWeight: 700 }}>Send SMS</h2>
+        <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>Send quick SMS to one or multiple numbers</p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
         <div style={styles.card}>
-          <h3 style={{ margin: '0 0 16px', fontSize: 15, fontWeight: 600, color: '#111827' }}>Configuration</h3>
+          <h3 style={{ margin: '0 0 16px', fontSize: 17, fontWeight: 600, color: '#111827' }}>Configuration</h3>
 
           <div style={styles.field}>
             <label style={styles.label}>Template (optional)</label>
@@ -139,11 +146,11 @@ const SmsSendSms = () => {
           </div>
 
           <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginTop: 4 }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', cursor: 'pointer' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 15, color: '#374151', cursor: 'pointer' }}>
               <input type="checkbox" checked={form.isUnicode} onChange={e => setForm(f => ({ ...f, isUnicode: e.target.checked }))} />
               Unicode (Hindi/Regional)
             </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', cursor: 'pointer' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 15, color: '#374151', cursor: 'pointer' }}>
               <input type="checkbox" checked={form.messageType === 'flash'} onChange={e => setForm(f => ({ ...f, messageType: e.target.checked ? 'flash' : 'text' }))} />
               Flash SMS
             </label>
@@ -151,18 +158,18 @@ const SmsSendSms = () => {
         </div>
 
         <div style={styles.card}>
-          <h3 style={{ margin: '0 0 16px', fontSize: 15, fontWeight: 600, color: '#111827' }}>Compose</h3>
+          <h3 style={{ margin: '0 0 16px', fontSize: 17, fontWeight: 600, color: '#111827' }}>Compose</h3>
 
           <div style={styles.field}>
             <label style={styles.label}><FiPhone size={12} style={{ marginRight: 4 }} />Numbers * (one per line or comma separated)</label>
             <textarea value={form.numbers} onChange={e => setForm(f => ({ ...f, numbers: e.target.value }))} style={{ ...styles.input, minHeight: 80, resize: 'vertical' }} placeholder="919876543210&#10;919876543211" />
-            <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>{numbers.length} number(s)</div>
+            <div style={{ fontSize: 13, color: '#9ca3af', marginTop: 4 }}>{numbers.length} number(s)</div>
           </div>
 
           <div style={styles.field}>
             <label style={styles.label}><FiType size={12} style={{ marginRight: 4 }} />Message *</label>
             <textarea value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} style={{ ...styles.input, minHeight: 120, resize: 'vertical' }} placeholder="Type your message..." />
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#9ca3af', marginTop: 4 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#9ca3af', marginTop: 4 }}>
               <span>{form.message.length} chars | {smsCount} SMS per number</span>
               <span>Total: {totalSms} SMS</span>
             </div>
@@ -184,15 +191,15 @@ const styles = {
     boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb',
   },
   field: { marginBottom: 14 },
-  label: { display: 'flex', alignItems: 'center', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 13 },
+  label: { display: 'flex', alignItems: 'center', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 15 },
   input: {
     width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb',
-    borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#f9fafb',
+    borderRadius: 10, fontSize: 16, outline: 'none', boxSizing: 'border-box', background: '#f9fafb',
   },
   primaryBtn: {
     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 24px',
     background: '#3B82F6', color: '#ffffff', border: 'none', borderRadius: 10,
-    fontWeight: 600, cursor: 'pointer', fontSize: 15, width: '100%',
+    fontWeight: 600, cursor: 'pointer', fontSize: 17, width: '100%',
     boxShadow: '0 2px 8px rgba(59,130,246,0.25)',
   },
 };

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import alert from '../../utils/alert';
-import { FiDollarSign, FiArrowRight } from 'react-icons/fi';
+import { FiCreditCard, FiArrowRight } from 'react-icons/fi';
 
 const ACCENT = '#3B82F6';
 
@@ -64,27 +64,27 @@ const SmsRecharge = () => {
   return (
     <div style={{ padding: '24px 28px' }}>
       <div style={{ marginBottom: 24 }}>
-        <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 22, fontWeight: 700 }}>SMS Recharge</h2>
-        <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>
+        <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 24, fontWeight: 700 }}>SMS Recharge</h2>
+        <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>
           {user?.role === 'super_admin' ? 'Recharge any reseller or user SMS balance' : "Recharge your users' SMS balance"}
         </p>
       </div>
 
       <div style={styles.walletCard}>
         <div>
-          <div style={{ fontSize: 13, color: '#6b7280', marginBottom: 4 }}>Your SMS Balance</div>
-          <div style={{ fontSize: 32, fontWeight: 700, color: ACCENT }}>
+          <div style={{ fontSize: 15, color: '#6b7280', marginBottom: 4 }}>Your SMS Balance</div>
+          <div style={{ fontSize: 34, fontWeight: 700, color: ACCENT }}>
             {myWallet?.balance || 0} SMS
           </div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: 12, color: '#6b7280' }}>Total Recharged: {myWallet?.totalRecharged || 0}</div>
-          <div style={{ fontSize: 12, color: '#6b7280' }}>Total Spent: {myWallet?.totalSpent || 0}</div>
+          <div style={{ fontSize: 14, color: '#6b7280' }}>Total Recharged: {myWallet?.totalRecharged || 0}</div>
+          <div style={{ fontSize: 14, color: '#6b7280' }}>Total Spent: {myWallet?.totalSpent || 0}</div>
         </div>
       </div>
 
       <div style={styles.rechargePanel}>
-        <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 600, color: '#111827' }}>Recharge User</h3>
+        <h3 style={{ margin: '0 0 16px', fontSize: 18, fontWeight: 600, color: '#111827' }}>Recharge User</h3>
 
         <div style={styles.field}>
           <label style={styles.label}>Select User *</label>
@@ -101,15 +101,15 @@ const SmsRecharge = () => {
               >
                 <div style={styles.avatar}>{u.name[0].toUpperCase()}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 600, fontSize: 14, color: '#111827' }}>{u.name}</div>
-                  <div style={{ fontSize: 12, color: '#6b7280' }}>{u.email}</div>
-                  <div style={{ fontSize: 11, color: '#9ca3af' }}>{u.role}</div>
+                  <div style={{ fontWeight: 600, fontSize: 16, color: '#111827' }}>{u.name}</div>
+                  <div style={{ fontSize: 14, color: '#6b7280' }}>{u.email}</div>
+                  <div style={{ fontSize: 13, color: '#9ca3af' }}>{u.role}</div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: 16, fontWeight: 700, color: ACCENT }}>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: ACCENT }}>
                     {u.SmsWallet?.balance || 0}
                   </div>
-                  <div style={{ fontSize: 10, color: '#9ca3af' }}>SMS</div>
+                  <div style={{ fontSize: 12, color: '#9ca3af' }}>SMS</div>
                 </div>
               </div>
             ))}
@@ -154,7 +154,7 @@ const SmsRecharge = () => {
                   <span>Recharge Amount</span>
                   <span style={{ fontWeight: 700 }}>{parseInt(smsCount)} SMS</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#6b7280' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 15, color: '#6b7280' }}>
                   <span>New Balance</span>
                   <span>{(selectedUser.SmsWallet?.balance || 0) + parseInt(smsCount)} SMS</span>
                 </div>
@@ -162,7 +162,7 @@ const SmsRecharge = () => {
             )}
 
             <button onClick={handleRecharge} style={styles.primaryBtn} disabled={submitting}>
-              <FiDollarSign size={18} />
+              <FiCreditCard size={18} />
               {submitting ? 'Processing...' : `Recharge ${smsCount || '0'} SMS`}
             </button>
           </>
@@ -176,15 +176,15 @@ const styles = {
   walletCard: { background: 'white', borderRadius: 14, padding: 24, boxShadow: '0 1px 3px rgba(0,0,0,0.04)', marginBottom: 16, border: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
   rechargePanel: { background: 'white', borderRadius: 14, padding: 24, boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' },
   field: { marginBottom: 16 },
-  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 13 },
-  input: { width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#f9fafb' },
+  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 15 },
+  input: { width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 16, outline: 'none', boxSizing: 'border-box', background: '#f9fafb' },
   userGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 10, maxHeight: 320, overflow: 'auto' },
   userItem: { display: 'flex', alignItems: 'center', gap: 12, padding: 12, border: '2px solid #e5e7eb', borderRadius: 12, cursor: 'pointer', transition: 'border-color 0.2s, background 0.2s' },
-  avatar: { width: 36, height: 36, borderRadius: '50%', background: '#374151', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 15, flexShrink: 0 },
-  selectedBanner: { display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', background: ACCENT + '10', border: `1px solid ${ACCENT}`, borderRadius: 10, fontSize: 14, marginBottom: 16, color: '#111827' },
-  quickBtn: { padding: '6px 14px', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 600, color: ACCENT },
-  summaryBox: { padding: 16, background: '#f9fafb', borderRadius: 10, marginBottom: 16, fontSize: 14, border: '1px solid #f3f4f6' },
-  primaryBtn: { display: 'flex', alignItems: 'center', gap: 8, padding: '12px 24px', background: ACCENT, color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 15, width: '100%', justifyContent: 'center', boxShadow: `0 2px 8px ${ACCENT}40` },
+  avatar: { width: 36, height: 36, borderRadius: '50%', background: '#374151', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 17, flexShrink: 0 },
+  selectedBanner: { display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', background: ACCENT + '10', border: `1px solid ${ACCENT}`, borderRadius: 10, fontSize: 16, marginBottom: 16, color: '#111827' },
+  quickBtn: { padding: '6px 14px', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8, cursor: 'pointer', fontSize: 15, fontWeight: 600, color: ACCENT },
+  summaryBox: { padding: 16, background: '#f9fafb', borderRadius: 10, marginBottom: 16, fontSize: 16, border: '1px solid #f3f4f6' },
+  primaryBtn: { display: 'flex', alignItems: 'center', gap: 8, padding: '12px 24px', background: ACCENT, color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 17, width: '100%', justifyContent: 'center', boxShadow: `0 2px 8px ${ACCENT}40` },
 };
 
 export default SmsRecharge;

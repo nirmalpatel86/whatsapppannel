@@ -45,8 +45,8 @@ const Companies = () => {
     <div style={{ padding: '24px 28px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 22, fontWeight: 700 }}>Companies</h2>
-          <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>{companies.length} companies</p>
+          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 24, fontWeight: 700 }}>Companies</h2>
+          <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>{companies.length} companies</p>
         </div>
         <button onClick={() => setShowCreate(true)} style={styles.primaryBtn}>
           <FiPlus size={18} /> Add Company
@@ -56,7 +56,7 @@ const Companies = () => {
       {showCreate && (
         <div style={styles.createPanel}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#111827' }}>Create Company</h3>
+            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: '#111827' }}>Create Company</h3>
             <button onClick={() => setShowCreate(false)} style={styles.iconBtn}><FiX size={16} /></button>
           </div>
           <div style={styles.formGrid}>
@@ -95,26 +95,26 @@ const Companies = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={styles.companyIcon}><FiBriefcase size={18} /></div>
-                <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#111827' }}>{company.name}</h3>
+                <h3 style={{ margin: 0, fontSize: 17, fontWeight: 600, color: '#111827' }}>{company.name}</h3>
               </div>
               <span style={{
-                padding: '4px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600,
+                padding: '4px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600,
                 background: (planColors[company.plan] || '#6b7280') + '20',
                 color: planColors[company.plan] || '#6b7280',
               }}>
                 {company.plan}
               </span>
             </div>
-            <p style={{ margin: '8px 0 0', fontSize: 13, color: '#6b7280' }}>
+            <p style={{ margin: '8px 0 0', fontSize: 15, color: '#6b7280' }}>
               Owner: {company.owner?.name || 'N/A'} ({company.owner?.email || ''})
             </p>
-            <div style={{ display: 'flex', gap: 16, marginTop: 12, fontSize: 13, color: '#9ca3af' }}>
+            <div style={{ display: 'flex', gap: 16, marginTop: 12, fontSize: 15, color: '#9ca3af' }}>
               <span>WA Accounts: <strong style={{ color: '#374151' }}>{company.maxWhatsappAccounts}</strong></span>
               <span>Campaigns/Day: <strong style={{ color: '#374151' }}>{company.maxCampaignsPerDay}</strong></span>
             </div>
             <div style={{ marginTop: 10 }}>
               <span style={{
-                padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600,
+                padding: '3px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600,
                 background: company.isActive ? '#22c55e20' : '#ef444420',
                 color: company.isActive ? '#22c55e' : '#ef4444',
               }}>
@@ -129,7 +129,7 @@ const Companies = () => {
         <div style={{ textAlign: 'center', padding: 60, color: '#9ca3af' }}>
           <FiBriefcase size={48} style={{ opacity: 0.3, marginBottom: 12 }} />
           <h3 style={{ color: '#6b7280', margin: '0 0 8px' }}>No companies yet</h3>
-          <p style={{ margin: 0, fontSize: 14 }}>Create a company to get started.</p>
+          <p style={{ margin: 0, fontSize: 16 }}>Create a company to get started.</p>
         </div>
       )}
     </div>
@@ -140,11 +140,11 @@ const styles = {
   primaryBtn: {
     display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px',
     background: '#e8b931', color: '#111827', border: 'none', borderRadius: 10,
-    fontWeight: 600, cursor: 'pointer', fontSize: 14, boxShadow: '0 2px 8px rgba(232,185,49,0.25)',
+    fontWeight: 600, cursor: 'pointer', fontSize: 16, boxShadow: '0 2px 8px rgba(232,185,49,0.25)',
   },
   secondaryBtn: {
     padding: '10px 20px', background: '#f3f4f6', color: '#374151',
-    border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 14,
+    border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 16,
   },
   iconBtn: { background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 4 },
   createPanel: {
@@ -155,10 +155,10 @@ const styles = {
     display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 16,
   },
   field: { marginBottom: 0 },
-  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 13 },
+  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 15 },
   input: {
     width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb',
-    borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#f9fafb',
+    borderRadius: 10, fontSize: 16, outline: 'none', boxSizing: 'border-box', background: '#f9fafb',
   },
   card: {
     background: 'white', borderRadius: 14, padding: 20,
