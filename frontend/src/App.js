@@ -1,9 +1,10 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import DashboardLayout from './layouts/DashboardLayout';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Profile from './pages/Profile';
 
 // WhatsApp pages
 import Dashboard from './pages/Dashboard';
@@ -41,6 +42,7 @@ import BmDashboard from './pages/bulkmail/BmDashboard';
 import BmSendEmail from './pages/bulkmail/BmSendEmail';
 import BmCampaigns from './pages/bulkmail/BmCampaigns';
 import BmTemplates from './pages/bulkmail/BmTemplates';
+import BmTemplateForm from './pages/bulkmail/BmTemplateForm';
 import BmSenders from './pages/bulkmail/BmSenders';
 import BmSmtp from './pages/bulkmail/BmSmtp';
 import BmContacts from './pages/bulkmail/BmContacts';
@@ -71,8 +73,11 @@ const PrivateRoute = ({ children, roles }) => {
 
 const PublicRoute = ({ children }) => {
   const { user, loading, activeService } = useAuth();
+  const location = useLocation();
   if (loading) return null;
-  if (user) return <Navigate to={SERVICE_DASHBOARD[activeService] || '/dashboard'} />;
+  // Switching to a service with no cached session routes here with fromSwitcher,
+  // even while another service's session is still active — let that through.
+  if (user && !location.state?.fromSwitcher) return <Navigate to={SERVICE_DASHBOARD[activeService] || '/dashboard'} />;
   return children;
 };
 
@@ -92,6 +97,7 @@ function App() {
 
           <Route path="/" element={<PrivateRoute><DashboardLayout /></PrivateRoute>}>
             <Route index element={<DefaultRedirect />} />
+            <Route path="profile" element={<Profile />} />
 
             {/* WhatsApp Routes */}
             <Route path="dashboard" element={<Dashboard />} />
@@ -152,6 +158,12 @@ function App() {
             <Route path="bulkmail/campaigns" element={<BmCampaigns />} />
             <Route path="bulkmail/templates" element={
               <PrivateRoute roles={['super_admin', 'admin', 'reseller']}><BmTemplates /></PrivateRoute>
+            } />
+            <Route path="bulkmail/templates/new" element={
+              <PrivateRoute roles={['super_admin', 'admin', 'reseller']}><BmTemplateForm /></PrivateRoute>
+            } />
+            <Route path="bulkmail/templates/:id/edit" element={
+              <PrivateRoute roles={['super_admin', 'admin', 'reseller']}><BmTemplateForm /></PrivateRoute>
             } />
             <Route path="bulkmail/senders" element={
               <PrivateRoute roles={['super_admin', 'admin', 'reseller']}><BmSenders /></PrivateRoute>

@@ -48,4 +48,10 @@ const SmsRoute = smsSequelize.define('SmsRoute', {
   tableName: 'sms_routes',
 });
 
+SmsRoute.prototype.toJSON = function () {
+  const values = { ...this.get() };
+  delete values.apiPassword;
+  return values;
+};
+
 module.exports = SmsRoute;

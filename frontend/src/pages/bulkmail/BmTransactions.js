@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import alert from '../../utils/alert';
 import { FiArrowUpCircle, FiArrowDownCircle, FiFilter } from 'react-icons/fi';
 
-const ACCENT = '#EF4444';
+const ACCENT = '#3B82F6';
 
 const BmTransactions = () => {
   const { user } = useAuth();
@@ -52,8 +52,8 @@ const BmTransactions = () => {
     <div style={{ padding: '24px 28px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
         <div>
-          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 22, fontWeight: 700 }}>Transaction History</h2>
-          <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>{total} transactions | Balance: ₹{wallet?.balance?.toFixed(2) || '0.00'}</p>
+          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 24, fontWeight: 700 }}>Transaction History</h2>
+          <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>{total} transactions | Balance: ₹{wallet?.balance?.toFixed(2) || '0.00'}</p>
         </div>
       </div>
 
@@ -92,13 +92,13 @@ const BmTransactions = () => {
               const TIcon = ti.icon;
               return (
                 <tr key={txn.id} style={styles.tr}>
-                  <td style={styles.td}><div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><TIcon size={18} color={ti.color} /><span style={{ fontSize: 13, fontWeight: 600, color: ti.color }}>{ti.label}</span></div></td>
+                  <td style={styles.td}><div style={{ display: 'flex', alignItems: 'center', gap: 6 }}><TIcon size={18} color={ti.color} /><span style={{ fontSize: 15, fontWeight: 600, color: ti.color }}>{ti.label}</span></div></td>
                   <td style={{ ...styles.td, fontWeight: 700, color: txn.type === 'deduction' ? '#ef4444' : '#22c55e' }}>{txn.type === 'deduction' ? '-' : '+'}₹{txn.amount?.toFixed(4)}</td>
                   <td style={styles.td}>₹{txn.balanceAfter?.toFixed(4)}</td>
                   <td style={{ ...styles.td, maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{txn.description}</td>
                   <td style={{ ...styles.td, color: '#6b7280' }}>{txn.emailCount || '-'}</td>
-                  <td style={styles.td}>{txn.performer ? <span style={{ fontSize: 12 }}>{txn.performer.name}</span> : '-'}</td>
-                  <td style={{ ...styles.td, fontSize: 12, whiteSpace: 'nowrap' }}>{formatDate(txn.createdAt)}</td>
+                  <td style={styles.td}>{txn.performer ? <span style={{ fontSize: 14 }}>{txn.performer.name}</span> : '-'}</td>
+                  <td style={{ ...styles.td, fontSize: 14, whiteSpace: 'nowrap' }}>{formatDate(txn.createdAt)}</td>
                 </tr>
               );
             })}
@@ -110,7 +110,7 @@ const BmTransactions = () => {
       {totalPages > 1 && (
         <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 16 }}>
           <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} style={styles.pageBtn}>Prev</button>
-          <span style={{ padding: '8px 16px', color: '#6b7280', fontSize: 13 }}>Page {page} of {totalPages}</span>
+          <span style={{ padding: '8px 16px', color: '#6b7280', fontSize: 15 }}>Page {page} of {totalPages}</span>
           <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} style={styles.pageBtn}>Next</button>
         </div>
       )}
@@ -120,21 +120,21 @@ const BmTransactions = () => {
 
 const SummaryCard = ({ label, value, color }) => (
   <div style={{ background: 'white', borderRadius: 14, padding: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' }}>
-    <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 4 }}>{label}</div>
-    <div style={{ fontSize: 20, fontWeight: 700, color }}>{value}</div>
+    <div style={{ fontSize: 14, color: '#6b7280', marginBottom: 4 }}>{label}</div>
+    <div style={{ fontSize: 22, fontWeight: 700, color }}>{value}</div>
   </div>
 );
 
 const styles = {
   filterBar: { background: 'white', borderRadius: 14, padding: '12px 16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)', marginBottom: 16, border: '1px solid #e5e7eb' },
-  filterSelect: { padding: '7px 12px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 13, outline: 'none', background: '#f9fafb' },
-  clearBtn: { padding: '7px 14px', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8, cursor: 'pointer', fontSize: 13, color: '#ef4444', fontWeight: 600 },
+  filterSelect: { padding: '7px 12px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 15, outline: 'none', background: '#f9fafb' },
+  clearBtn: { padding: '7px 14px', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8, cursor: 'pointer', fontSize: 15, color: '#ef4444', fontWeight: 600 },
   tableWrapper: { background: 'white', borderRadius: 14, overflow: 'auto', boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' },
   table: { width: '100%', borderCollapse: 'collapse', minWidth: 700 },
-  th: { textAlign: 'left', padding: '10px 14px', borderBottom: '2px solid #f3f4f6', fontSize: 11, fontWeight: 600, color: '#9ca3af', background: '#f9fafb', whiteSpace: 'nowrap', textTransform: 'uppercase', letterSpacing: 0.5 },
+  th: { textAlign: 'left', padding: '10px 14px', borderBottom: '2px solid #f3f4f6', fontSize: 13, fontWeight: 600, color: '#9ca3af', background: '#f9fafb', whiteSpace: 'nowrap', textTransform: 'uppercase', letterSpacing: 0.5 },
   tr: { borderBottom: '1px solid #f3f4f6' },
-  td: { padding: '10px 14px', fontSize: 13, color: '#374151' },
-  pageBtn: { padding: '8px 16px', background: 'white', border: '1px solid #e5e7eb', borderRadius: 8, cursor: 'pointer', fontSize: 13 },
+  td: { padding: '10px 14px', fontSize: 15, color: '#374151' },
+  pageBtn: { padding: '8px 16px', background: 'white', border: '1px solid #e5e7eb', borderRadius: 8, cursor: 'pointer', fontSize: 15 },
 };
 
 export default BmTransactions;

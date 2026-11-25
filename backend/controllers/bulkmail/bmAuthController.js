@@ -67,3 +67,31 @@ exports.login = async (req, res) => {
 exports.me = async (req, res) => {
   res.json({ user: req.user.toJSON() });
 };
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, email, password, currentPassword } = req.body;
+    const user = req.user;
+
+    if (password) {
+      if (!currentPassword) {
+        return res.status(400).json({ error: 'Current password is required to set a new password' });
+      }
+      const valid = await user.validatePassword(currentPassword);
+      if (!valid) {
+        return res.status(401).json({ error: 'Current password is incorrect' });
+      }
+      user.password = password;
+    }
+    if (name) user.name = name;
+    if (email !== undefined) user.email = email || null;
+
+    await user.save();
+    res.json({ user: user.toJSON() });
+  } catch (err) {
+    if (err.name === 'SequelizeUniqueConstraintError') {
+      return res.status(400).json({ error: 'Email already in use' });
+    }
+    res.status(500).json({ error: err.message });
+  }
+};

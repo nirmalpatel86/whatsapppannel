@@ -36,6 +36,14 @@ const BmSmtp = bulkmailSequelize.define('BmSmtp', {
     type: DataTypes.ENUM('none', 'ssl', 'tls'),
     defaultValue: 'tls',
   },
+  userId: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  type: {
+    type: DataTypes.ENUM('sendgrid', 'sendclean', 'general'),
+    defaultValue: 'general',
+  },
   isActive: {
     type: DataTypes.BOOLEAN,
     defaultValue: true,
@@ -48,5 +56,11 @@ const BmSmtp = bulkmailSequelize.define('BmSmtp', {
   timestamps: true,
   tableName: 'bm_smtp_servers',
 });
+
+BmSmtp.prototype.toJSON = function () {
+  const values = { ...this.get() };
+  delete values.password;
+  return values;
+};
 
 module.exports = BmSmtp;

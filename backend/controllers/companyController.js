@@ -1,4 +1,5 @@
 const { Company, User, WhatsappAccount } = require('../models');
+const { getVisibleCompanyIds } = require('../utils/scopeHelper');
 
 exports.list = async (req, res) => {
   try {
@@ -21,6 +22,12 @@ exports.get = async (req, res) => {
       ],
     });
     if (!company) return res.status(404).json({ error: 'Company not found' });
+    if (req.user.role !== 'super_admin') {
+      const visibleCompanyIds = await getVisibleCompanyIds(User, req.user);
+      if (!visibleCompanyIds.includes(company.id)) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+    }
     res.json({ company });
   } catch (err) {
     res.status(500).json({ error: err.message });

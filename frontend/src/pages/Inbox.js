@@ -2,9 +2,50 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import api from '../services/api';
 import { getSocket } from '../services/socket';
 import alert from '../utils/alert';
-import { FiSend, FiSearch, FiPaperclip, FiMessageSquare, FiPhone, FiArrowDown, FiPlus, FiX, FiCheck, FiFileText, FiFile, FiTrash2, FiMoreVertical } from 'react-icons/fi';
+import { FiSend, FiSearch, FiPaperclip, FiMessageSquare, FiPhone, FiArrowDown, FiPlus, FiX, FiCheck, FiFileText, FiFile, FiTrash2, FiMoreVertical, FiSmile } from 'react-icons/fi';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:4001';
+
+// WhatsApp's own palette, so the chat screen reads like the real app.
+const WA_HEADER = '#008069';
+const WA_GREEN = '#00a884';
+const WA_OUTBOUND = '#d9fdd3';
+const WA_WALLPAPER = '#efeae2';
+const WA_TICK_READ = '#53bdeb';
+const WA_ICON = '#54656f';
+
+// Common emoji, grouped loosely so the picker doesn't feel like a wall of icons.
+const EMOJI_LIST = [
+  '😀', '😁', '😂', '🤣', '😊', '😍', '😘', '😜', '🤔', '😎',
+  '😅', '😇', '🥰', '😋', '😴', '🙄', '😬', '😢', '😭', '😡',
+  '🥳', '🤗', '🤒', '😱', '🙏', '👍', '👎', '👏', '💪', '🙌',
+  '👌', '✌️', '🤝', '👋', '❤️', '💔', '💯', '🔥', '🎉', '✨',
+  '⚡', '🌟', '☀️', '🌙', '🎁', '📞', '📱', '💰', '🕒', '📍',
+];
+
+const EmojiPicker = ({ onSelect }) => (
+  <div style={styles.emojiPicker}>
+    {EMOJI_LIST.map((emoji, i) => (
+      <button key={i} onClick={() => onSelect(emoji)} style={styles.emojiBtn} type="button">
+        {emoji}
+      </button>
+    ))}
+  </div>
+);
+
+// Renders WhatsApp-style *bold*, _italic_, ~strikethrough~ and ```monospace``` markers.
+const formatMessageBody = (text) => {
+  if (!text) return null;
+  const regex = /(\*[^*\n]+\*|_[^_\n]+_|~[^~\n]+~|```[^`\n]+```)/g;
+  return text.split(regex).map((part, i) => {
+    if (!part) return null;
+    if (/^\*[^*\n]+\*$/.test(part)) return <strong key={i}>{part.slice(1, -1)}</strong>;
+    if (/^_[^_\n]+_$/.test(part)) return <em key={i}>{part.slice(1, -1)}</em>;
+    if (/^~[^~\n]+~$/.test(part)) return <s key={i}>{part.slice(1, -1)}</s>;
+    if (/^```[^`\n]+```$/.test(part)) return <code key={i} style={{ fontFamily: 'monospace', background: 'rgba(0,0,0,0.06)', padding: '1px 4px', borderRadius: 3 }}>{part.slice(3, -3)}</code>;
+    return part;
+  });
+};
 
 const Inbox = () => {
   const [chats, setChats] = useState([]);
@@ -25,9 +66,24 @@ const Inbox = () => {
   const [pendingFile, setPendingFile] = useState(null);
   const [hoveredMsg, setHoveredMsg] = useState(null);
   const [showChatMenu, setShowChatMenu] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
   const fileInputRef = useRef(null);
+  const messageInputRef = useRef(null);
+
+  const insertEmoji = (emoji) => {
+    const el = messageInputRef.current;
+    const start = el?.selectionStart ?? newMessage.length;
+    const end = el?.selectionEnd ?? newMessage.length;
+    const updated = newMessage.slice(0, start) + emoji + newMessage.slice(end);
+    setNewMessage(updated);
+    requestAnimationFrame(() => {
+      if (!el) return;
+      el.focus();
+      el.selectionStart = el.selectionEnd = start + emoji.length;
+    });
+  };
 
   const fetchChats = useCallback(async () => {
     try {
@@ -116,6 +172,10 @@ const Inbox = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    if (!newMessage) autoGrowMessageInput(messageInputRef.current);
+  }, [newMessage]);
 
   const handleScroll = () => {
     const container = messagesContainerRef.current;
@@ -244,6 +304,12 @@ const Inbox = () => {
     }
   };
 
+  const autoGrowMessageInput = (el) => {
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+  };
+
   const formatTime = (date) => {
     if (!date) return '';
     return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -275,11 +341,11 @@ const Inbox = () => {
   };
 
   const StatusTicks = ({ status }) => {
-    if (status === 'read') return <span style={{ color: '#3b82f6', marginLeft: 4 }}>✓✓</span>;
-    if (status === 'delivered') return <span style={{ color: '#9ca3af', marginLeft: 4 }}>✓✓</span>;
-    if (status === 'sent') return <span style={{ color: '#9ca3af', marginLeft: 4 }}>✓</span>;
+    if (status === 'read') return <span style={{ color: WA_TICK_READ, marginLeft: 4 }}>✓✓</span>;
+    if (status === 'delivered') return <span style={{ color: '#8696a0', marginLeft: 4 }}>✓✓</span>;
+    if (status === 'sent') return <span style={{ color: '#8696a0', marginLeft: 4 }}>✓</span>;
     if (status === 'failed') return <span style={{ color: '#ef4444', marginLeft: 4 }}>!</span>;
-    return <span style={{ color: '#d1d5db', marginLeft: 4 }}>○</span>;
+    return <span style={{ color: '#8696a0', marginLeft: 4 }}>○</span>;
   };
 
   const MediaPreview = ({ msg }) => {
@@ -295,7 +361,7 @@ const Inbox = () => {
       return <audio src={url} controls style={{ maxWidth: '100%', marginBottom: 4 }} />;
     }
     return (
-      <a href={url} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: '#f3f4f6', borderRadius: 8, marginBottom: 4, textDecoration: 'none', color: '#374151', fontSize: 13 }}>
+      <a href={url} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: '#f3f4f6', borderRadius: 8, marginBottom: 4, textDecoration: 'none', color: '#374151', fontSize: 14 }}>
         <FiFile size={18} /> {msg.body || 'Document'}
       </a>
     );
@@ -312,7 +378,7 @@ const Inbox = () => {
       {/* Chat list */}
       <div style={styles.chatList}>
         <div style={styles.chatListHeader}>
-          <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#111827', flex: 1 }}>
+          <h3 style={{ margin: 0, fontSize: 19, fontWeight: 700, color: '#111827', flex: 1 }}>
             Chats {totalUnread > 0 && <span style={styles.totalBadge}>{totalUnread}</span>}
           </h3>
           <button onClick={() => { setShowCompose(true); setSelectedChat(null); }} style={styles.composeBtn} title="New Message">
@@ -331,29 +397,28 @@ const Inbox = () => {
               onClick={() => selectChat(chat)}
               style={{
                 ...styles.chatItem,
-                background: selectedChat?.id === chat.id ? '#f1f5f9' : 'white',
-                borderLeft: selectedChat?.id === chat.id ? '3px solid #e8b931' : '3px solid transparent',
+                background: selectedChat?.id === chat.id ? '#f0f2f5' : 'white',
               }}
             >
               <div style={{
                 ...styles.avatar,
-                background: chat.unreadCount > 0 ? '#e8b931' : '#374151',
-                color: chat.unreadCount > 0 ? '#111827' : 'white',
+                background: chat.unreadCount > 0 ? WA_GREEN : '#374151',
+                color: 'white',
               }}>
                 {(chat.Contact?.name || chat.Contact?.phone || '?')[0].toUpperCase()}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontWeight: chat.unreadCount > 0 ? 700 : 500, fontSize: 14, color: '#111827' }}>
+                  <span style={{ fontWeight: chat.unreadCount > 0 ? 700 : 500, fontSize: 15, color: '#111827' }}>
                     {chat.Contact?.name || chat.Contact?.phone}
                   </span>
-                  <span style={{ fontSize: 11, color: chat.unreadCount > 0 ? '#e8b931' : '#9ca3af', fontWeight: chat.unreadCount > 0 ? 600 : 400 }}>
+                  <span style={{ fontSize: 12, color: chat.unreadCount > 0 ? WA_GREEN : '#9ca3af', fontWeight: chat.unreadCount > 0 ? 600 : 400 }}>
                     {formatTime(chat.lastMessageAt)}
                   </span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 2 }}>
                   <span style={{
-                    fontSize: 13, color: chat.unreadCount > 0 ? '#374151' : '#9ca3af',
+                    fontSize: 14, color: chat.unreadCount > 0 ? '#374151' : '#9ca3af',
                     fontWeight: chat.unreadCount > 0 ? 500 : 400,
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 230,
                   }}>
@@ -367,8 +432,8 @@ const Inbox = () => {
           {chats.length === 0 && !loading && (
             <div style={{ padding: 40, textAlign: 'center', color: '#9ca3af' }}>
               <FiMessageSquare size={32} style={{ opacity: 0.4, marginBottom: 8 }} />
-              <p style={{ margin: 0, fontSize: 14 }}>No conversations yet</p>
-              <button onClick={() => setShowCompose(true)} style={{ ...styles.composeBtn, marginTop: 12, padding: '8px 16px', borderRadius: 8, fontSize: 13 }}>
+              <p style={{ margin: 0, fontSize: 15 }}>No conversations yet</p>
+              <button onClick={() => setShowCompose(true)} style={{ ...styles.composeBtn, marginTop: 12, padding: '8px 16px', borderRadius: 8, fontSize: 14 }}>
                 <FiPlus size={14} /> Start a conversation
               </button>
             </div>
@@ -381,12 +446,12 @@ const Inbox = () => {
         {showCompose ? (
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <div style={styles.chatHeader}>
-              <FiSend size={20} color="#e8b931" />
+              <FiSend size={20} color="white" />
               <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 600, fontSize: 15, color: '#111827' }}>New Message</div>
-                <div style={{ fontSize: 12, color: '#9ca3af' }}>Send a message to any contact or phone number</div>
+                <div style={{ fontWeight: 600, fontSize: 16, color: 'white' }}>New Message</div>
+                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>Send a message to any contact or phone number</div>
               </div>
-              <button onClick={() => setShowCompose(false)} style={styles.iconBtn}><FiX size={18} /></button>
+              <button onClick={() => setShowCompose(false)} style={{ ...styles.iconBtn, color: 'white' }}><FiX size={18} /></button>
             </div>
 
             <div style={{ flex: 1, overflow: 'auto', padding: 24 }}>
@@ -401,11 +466,11 @@ const Inbox = () => {
                   </div>
                 ) : accounts.length === 1 ? (
                   <div style={{ marginBottom: 16, padding: '10px 14px', background: '#f9fafb', borderRadius: 10, border: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <FiPhone size={14} color="#e8b931" />
-                    <span style={{ fontSize: 13, color: '#374151' }}>Sending via <strong>{accounts[0].name}</strong> ({accounts[0].phone})</span>
+                    <FiPhone size={14} color="#00a884" />
+                    <span style={{ fontSize: 14, color: '#374151' }}>Sending via <strong>{accounts[0].name}</strong> ({accounts[0].phone})</span>
                   </div>
                 ) : (
-                  <div style={{ marginBottom: 16, padding: '12px 14px', background: '#fef2f2', borderRadius: 10, border: '1px solid #fecaca', fontSize: 13, color: '#ef4444' }}>
+                  <div style={{ marginBottom: 16, padding: '12px 14px', background: '#fef2f2', borderRadius: 10, border: '1px solid #fecaca', fontSize: 14, color: '#ef4444' }}>
                     No connected WhatsApp account. Please connect one first.
                   </div>
                 )}
@@ -424,16 +489,16 @@ const Inbox = () => {
                     </div>
                     <div style={{ maxHeight: 180, overflow: 'auto' }}>
                       {filteredContacts.slice(0, 50).map(c => (
-                        <div key={c.id} onClick={() => setCompose({ ...compose, phone: c.phone })} style={{ ...styles.contactOption, background: compose.phone === c.phone ? '#e8b93112' : 'transparent' }}>
+                        <div key={c.id} onClick={() => setCompose({ ...compose, phone: c.phone })} style={{ ...styles.contactOption, background: compose.phone === c.phone ? '#00a88412' : 'transparent' }}>
                           <div style={styles.miniAvatar}>{(c.name || c.phone)[0].toUpperCase()}</div>
                           <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: 13, fontWeight: 500, color: '#111827' }}>{c.name || c.phone}</div>
-                            <div style={{ fontSize: 11, color: '#9ca3af' }}>{c.phone}</div>
+                            <div style={{ fontSize: 14, fontWeight: 500, color: '#111827' }}>{c.name || c.phone}</div>
+                            <div style={{ fontSize: 12, color: '#9ca3af' }}>{c.phone}</div>
                           </div>
-                          {compose.phone === c.phone && <FiCheck size={16} color="#e8b931" />}
+                          {compose.phone === c.phone && <FiCheck size={16} color="#00a884" />}
                         </div>
                       ))}
-                      {filteredContacts.length === 0 && <div style={{ padding: 16, textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>No contacts found</div>}
+                      {filteredContacts.length === 0 && <div style={{ padding: 16, textAlign: 'center', color: '#9ca3af', fontSize: 14 }}>No contacts found</div>}
                     </div>
                   </div>
                 </div>
@@ -441,15 +506,15 @@ const Inbox = () => {
                 <div style={{ marginBottom: 16 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                     <label style={{ ...styles.label, marginBottom: 0 }}>Message *</label>
-                    <button onClick={() => setShowTemplates(!showTemplates)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', background: showTemplates ? '#e8b93120' : '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: 6, cursor: 'pointer', fontSize: 12, color: '#374151', fontWeight: 500 }}>
+                    <button onClick={() => setShowTemplates(!showTemplates)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', background: showTemplates ? '#00a88420' : '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: 6, cursor: 'pointer', fontSize: 13, color: '#374151', fontWeight: 500 }}>
                       <FiFileText size={12} /> Templates
                     </button>
                   </div>
                   {showTemplates && templates.length > 0 && (
                     <div style={{ marginBottom: 8, maxHeight: 150, overflow: 'auto', border: '1px solid #e5e7eb', borderRadius: 8, background: '#f9fafb' }}>
                       {templates.map(t => (
-                        <div key={t.id} onClick={() => applyTemplate(t)} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid #f3f4f6', fontSize: 13, color: '#374151' }}>
-                          <div style={{ fontWeight: 600, fontSize: 12, color: '#e8b931', marginBottom: 2 }}>{t.name}</div>
+                        <div key={t.id} onClick={() => applyTemplate(t)} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid #f3f4f6', fontSize: 14, color: '#374151' }}>
+                          <div style={{ fontWeight: 600, fontSize: 13, color: '#00a884', marginBottom: 2 }}>{t.name}</div>
                           <div style={{ color: '#6b7280', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.body}</div>
                         </div>
                       ))}
@@ -467,21 +532,21 @@ const Inbox = () => {
         ) : selectedChat ? (
           <>
             <div style={styles.chatHeader}>
-              <div style={{ ...styles.avatar, width: 40, height: 40, background: '#374151', color: 'white' }}>
+              <div style={{ ...styles.avatar, width: 40, height: 40, background: 'rgba(255,255,255,0.2)', color: 'white' }}>
                 {(selectedChat.Contact?.name || selectedChat.Contact?.phone || '?')[0].toUpperCase()}
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 600, fontSize: 15, color: '#111827' }}>
+                <div style={{ fontWeight: 600, fontSize: 16, color: 'white' }}>
                   {selectedChat.Contact?.name || selectedChat.Contact?.phone}
                 </div>
-                <div style={{ fontSize: 12, color: '#9ca3af', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', display: 'flex', alignItems: 'center', gap: 4 }}>
                   <FiPhone size={10} />
                   {selectedChat.Contact?.phone}
                   {selectedChat.WhatsappAccount && ` · via ${selectedChat.WhatsappAccount.name}`}
                 </div>
               </div>
               <div style={{ position: 'relative' }}>
-                <button onClick={() => setShowChatMenu(!showChatMenu)} style={styles.iconBtn} title="Chat options">
+                <button onClick={() => setShowChatMenu(!showChatMenu)} style={{ ...styles.iconBtn, color: 'white' }} title="Chat options">
                   <FiMoreVertical size={18} />
                 </button>
                 {showChatMenu && (
@@ -510,17 +575,17 @@ const Inbox = () => {
                     key={msg.id || i}
                     onMouseEnter={() => setHoveredMsg(msg.id)}
                     onMouseLeave={() => setHoveredMsg(prev => (prev === msg.id ? null : prev))}
-                    style={{ display: 'flex', alignItems: 'center', gap: 6, alignSelf: isOutbound ? 'flex-end' : 'flex-start', flexDirection: isOutbound ? 'row-reverse' : 'row' }}
+                    style={{ display: 'flex', width: '100%', alignItems: 'center', gap: 6, justifyContent: isOutbound ? 'flex-end' : 'flex-start', flexDirection: isOutbound ? 'row-reverse' : 'row' }}
                   >
-                    <div style={{ ...styles.messageBubble, background: isOutbound ? '#e8b93115' : 'white', border: isOutbound ? '1px solid #e8b93130' : '1px solid #e5e7eb', borderBottomRightRadius: isOutbound ? 2 : 12, borderBottomLeftRadius: isOutbound ? 12 : 2 }}>
+                    <div style={{ ...styles.messageBubble, background: isOutbound ? WA_OUTBOUND : 'white', borderBottomRightRadius: isOutbound ? 2 : 7, borderBottomLeftRadius: isOutbound ? 7 : 2 }}>
                       {msg.isDeleted ? (
-                        <div style={{ fontSize: 13, color: '#9ca3af', fontStyle: 'italic' }}>This message was deleted</div>
+                        <div style={{ fontSize: 14, color: '#9ca3af', fontStyle: 'italic' }}>This message was deleted</div>
                       ) : (
                         <>
                           {msg.mediaUrl && <MediaPreview msg={msg} />}
                           {msg.type !== 'text' && !msg.mediaUrl && <div style={styles.mediaTag}>{msg.type}</div>}
-                          {msg.body && <div style={{ fontSize: 14, lineHeight: 1.5, wordBreak: 'break-word', color: '#111827' }}>{msg.body}</div>}
-                          {!msg.body && !msg.mediaUrl && <div style={{ fontSize: 14, color: '#9ca3af' }}>[{msg.type}]</div>}
+                          {msg.body && <div style={{ fontSize: 15, lineHeight: 1.5, wordBreak: 'break-word', whiteSpace: 'pre-wrap', color: '#111827' }}>{formatMessageBody(msg.body)}</div>}
+                          {!msg.body && !msg.mediaUrl && <div style={{ fontSize: 15, color: '#9ca3af' }}>[{msg.type}]</div>}
                         </>
                       )}
                       <div style={styles.msgMeta}>
@@ -546,17 +611,21 @@ const Inbox = () => {
             {showTemplates && templates.length > 0 && (
               <div style={{ padding: '8px 16px', background: '#f9fafb', borderTop: '1px solid #e5e7eb', maxHeight: 160, overflow: 'auto' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: 0.5 }}>Templates</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: 0.5 }}>Templates</span>
                   <button onClick={() => setShowTemplates(false)} style={styles.iconBtn}><FiX size={14} /></button>
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                   {templates.map(t => (
-                    <button key={t.id} onClick={() => applyTemplate(t)} style={{ padding: '6px 12px', background: 'white', border: '1px solid #e5e7eb', borderRadius: 8, cursor: 'pointer', fontSize: 12, color: '#374151', fontWeight: 500 }}>
+                    <button key={t.id} onClick={() => applyTemplate(t)} style={{ padding: '6px 12px', background: 'white', border: '1px solid #e5e7eb', borderRadius: 8, cursor: 'pointer', fontSize: 13, color: '#374151', fontWeight: 500 }}>
                       {t.name}
                     </button>
                   ))}
                 </div>
               </div>
+            )}
+
+            {showEmojiPicker && (
+              <EmojiPicker onSelect={insertEmoji} />
             )}
 
             {pendingFile && (
@@ -567,8 +636,8 @@ const Inbox = () => {
                   ) : (
                     <div style={{ width: 40, height: 40, borderRadius: 6, background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><FiFile size={18} color="#6b7280" /></div>
                   )}
-                  <span style={{ fontSize: 13, color: '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pendingFile.name}</span>
-                  <span style={{ fontSize: 11, color: '#9ca3af', flexShrink: 0 }}>({(pendingFile.size / 1024).toFixed(0)} KB)</span>
+                  <span style={{ fontSize: 14, color: '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{pendingFile.name}</span>
+                  <span style={{ fontSize: 12, color: '#9ca3af', flexShrink: 0 }}>({(pendingFile.size / 1024).toFixed(0)} KB)</span>
                 </div>
                 <button onClick={() => setPendingFile(null)} style={styles.iconBtn} title="Remove"><FiX size={18} /></button>
               </div>
@@ -576,9 +645,18 @@ const Inbox = () => {
 
             <div style={styles.inputArea}>
               <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileSelect} accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.csv,.zip" />
-              <button onClick={() => fileInputRef.current?.click()} style={styles.iconBtn} title="Send attachment"><FiPaperclip size={20} /></button>
-              <button onClick={() => setShowTemplates(!showTemplates)} style={{ ...styles.iconBtn, color: showTemplates ? '#e8b931' : '#9ca3af' }} title="Templates"><FiFileText size={19} /></button>
-              <input value={newMessage} onChange={(e) => setNewMessage(e.target.value)} onKeyPress={handleKeyPress} placeholder={pendingFile ? "Add a caption (optional)..." : "Type a message..."} style={styles.messageInput} />
+              <button onClick={() => { setShowEmojiPicker(false); fileInputRef.current?.click(); }} style={styles.iconBtn} title="Send attachment"><FiPaperclip size={20} /></button>
+              <button onClick={() => { setShowTemplates(!showTemplates); setShowEmojiPicker(false); }} style={{ ...styles.iconBtn, color: showTemplates ? '#00a884' : '#9ca3af' }} title="Templates"><FiFileText size={19} /></button>
+              <button onClick={() => { setShowEmojiPicker(!showEmojiPicker); setShowTemplates(false); }} style={{ ...styles.iconBtn, color: showEmojiPicker ? '#00a884' : '#9ca3af' }} title="Emoji"><FiSmile size={20} /></button>
+              <textarea
+                ref={messageInputRef}
+                value={newMessage}
+                onChange={(e) => { setNewMessage(e.target.value); autoGrowMessageInput(e.target); }}
+                onKeyDown={handleKeyPress}
+                placeholder={pendingFile ? "Add a caption (optional)..." : "Type a message..."}
+                rows={1}
+                style={styles.messageInput}
+              />
               <button onClick={pendingFile ? sendAttachment : sendMessage} disabled={sending || (!pendingFile && !newMessage.trim())} style={{ ...styles.sendBtn, opacity: (pendingFile || newMessage.trim()) ? 1 : 0.4 }}>
                 <FiSend size={17} />
               </button>
@@ -587,10 +665,10 @@ const Inbox = () => {
         ) : (
           <div style={styles.noChat}>
             <div style={styles.noChatIcon}>
-              <FiMessageSquare size={40} color="#e8b931" />
+              <FiMessageSquare size={40} color="#00a884" />
             </div>
-            <h3 style={{ color: '#111827', margin: '20px 0 8px', fontWeight: 600, fontSize: 18 }}>Leadofy Messenger</h3>
-            <p style={{ color: '#9ca3af', margin: '0 0 20px', fontSize: 14, maxWidth: 320, textAlign: 'center', lineHeight: 1.5 }}>
+            <h3 style={{ color: '#111827', margin: '20px 0 8px', fontWeight: 600, fontSize: 19 }}>Leadofy Messenger</h3>
+            <p style={{ color: '#9ca3af', margin: '0 0 20px', fontSize: 15, maxWidth: 320, textAlign: 'center', lineHeight: 1.5 }}>
               Select a conversation or start a new one. Incoming messages appear here in real-time.
             </p>
             <button onClick={() => setShowCompose(true)} style={styles.sendNewBtn}>
@@ -604,42 +682,44 @@ const Inbox = () => {
 };
 
 const styles = {
-  chatList: { width: 380, borderRight: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column', background: 'white', flexShrink: 0 },
+  chatList: { width: 380, borderRight: '1px solid #d1d7db', display: 'flex', flexDirection: 'column', background: 'white', flexShrink: 0 },
   chatListHeader: { padding: '18px 16px 12px', display: 'flex', alignItems: 'center' },
-  totalBadge: { fontSize: 11, fontWeight: 700, background: '#e8b931', color: '#111827', borderRadius: 10, padding: '2px 8px', marginLeft: 6, verticalAlign: 'middle' },
-  composeBtn: { display: 'flex', alignItems: 'center', gap: 4, padding: 8, background: '#e8b931', color: '#111827', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 },
+  totalBadge: { fontSize: 11, fontWeight: 700, background: WA_GREEN, color: 'white', borderRadius: 10, padding: '2px 8px', marginLeft: 6, verticalAlign: 'middle' },
+  composeBtn: { display: 'flex', alignItems: 'center', gap: 4, padding: 8, background: WA_GREEN, color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 },
   searchBar: { display: 'flex', alignItems: 'center', gap: 8, padding: '0 12px 10px' },
-  searchInput: { flex: 1, padding: '9px 12px', border: '1px solid #e5e7eb', borderRadius: 8, background: '#f9fafb', fontSize: 13, outline: 'none', color: '#111827' },
+  searchInput: { flex: 1, padding: '8px 12px', border: 'none', borderRadius: 18, background: '#f0f2f5', fontSize: 13, outline: 'none', color: '#111827' },
   chatItem: { display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', cursor: 'pointer', borderBottom: '1px solid #f3f4f6', transition: 'background 0.12s' },
   avatar: { width: 42, height: 42, borderRadius: '50%', background: '#374151', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 16, flexShrink: 0 },
-  badge: { background: '#e8b931', color: '#111827', borderRadius: 12, padding: '1px 7px', fontSize: 11, fontWeight: 700, minWidth: 18, textAlign: 'center', flexShrink: 0 },
-  messageArea: { flex: 1, display: 'flex', flexDirection: 'column', background: '#f9fafb', position: 'relative' },
-  chatHeader: { display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'white', borderBottom: '1px solid #e5e7eb' },
+  badge: { background: WA_GREEN, color: 'white', borderRadius: 12, padding: '1px 7px', fontSize: 11, fontWeight: 700, minWidth: 18, textAlign: 'center', flexShrink: 0 },
+  messageArea: { flex: 1, display: 'flex', flexDirection: 'column', background: WA_WALLPAPER, position: 'relative' },
+  chatHeader: { display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', background: WA_HEADER, borderBottom: 'none' },
   messages: { flex: 1, overflow: 'auto', padding: '12px 48px', display: 'flex', flexDirection: 'column', gap: 3 },
   dateDivider: { display: 'flex', justifyContent: 'center', margin: '14px 0 8px' },
-  dateLabel: { padding: '4px 14px', background: '#e5e7eb', borderRadius: 8, fontSize: 11, fontWeight: 600, color: '#6b7280' },
-  messageBubble: { maxWidth: '60%', padding: '8px 12px 4px', borderRadius: 12, marginBottom: 2 },
+  dateLabel: { padding: '4px 10px', background: 'white', borderRadius: 6, fontSize: 11, fontWeight: 500, color: '#54656f', boxShadow: '0 1px 0.5px rgba(0,0,0,0.13)' },
+  messageBubble: { maxWidth: '60%', padding: '7px 11px 4px', borderRadius: 7, marginBottom: 2, boxShadow: '0 1px 0.5px rgba(0,0,0,0.13)' },
   mediaTag: { display: 'inline-block', padding: '2px 8px', background: '#f3f4f6', borderRadius: 4, fontSize: 11, fontWeight: 600, color: '#6b7280', marginBottom: 4, textTransform: 'uppercase' },
-  msgMeta: { fontSize: 11, color: '#9ca3af', textAlign: 'right', marginTop: 2, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' },
-  scrollBtn: { position: 'absolute', bottom: 80, right: 24, width: 40, height: 40, borderRadius: '50%', background: 'white', border: '1px solid #e5e7eb', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', zIndex: 10 },
-  filePreviewBar: { display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', background: '#f9fafb', borderTop: '1px solid #e5e7eb' },
-  inputArea: { display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', background: 'white', borderTop: '1px solid #e5e7eb' },
-  messageInput: { flex: 1, padding: '10px 16px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 14, outline: 'none', background: '#f9fafb', color: '#111827' },
-  iconBtn: { background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 4 },
-  sendBtn: { background: '#e8b931', color: '#111827', border: 'none', borderRadius: '50%', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'opacity 0.2s' },
-  noChat: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f9fafb' },
-  noChatIcon: { width: 88, height: 88, borderRadius: '50%', background: '#e8b93112', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #e8b93125' },
-  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 13 },
-  composeInput: { width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#f9fafb' },
+  msgMeta: { fontSize: 10, color: '#667781', textAlign: 'right', marginTop: 2, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' },
+  scrollBtn: { position: 'absolute', bottom: 80, right: 24, width: 40, height: 40, borderRadius: '50%', background: 'white', border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.2)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: WA_ICON, zIndex: 10 },
+  filePreviewBar: { display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', background: '#f0f2f5', borderTop: '1px solid #e9edef' },
+  inputArea: { display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', background: '#f0f2f5', borderTop: 'none' },
+  messageInput: { flex: 1, padding: '9px 16px', border: 'none', borderRadius: 22, fontSize: 14, outline: 'none', background: 'white', color: '#111827', resize: 'none', fontFamily: 'inherit', lineHeight: 1.4, maxHeight: 120, overflowY: 'auto', boxSizing: 'border-box' },
+  emojiPicker: { display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: 4, padding: '10px 16px', background: '#f0f2f5', borderTop: '1px solid #e9edef', maxHeight: 160, overflow: 'auto' },
+  emojiBtn: { background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, padding: 4, borderRadius: 6, lineHeight: 1 },
+  iconBtn: { background: 'none', border: 'none', cursor: 'pointer', color: WA_ICON, padding: 4 },
+  sendBtn: { background: WA_GREEN, color: 'white', border: 'none', borderRadius: '50%', width: 40, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'opacity 0.2s' },
+  noChat: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: WA_WALLPAPER },
+  noChatIcon: { width: 88, height: 88, borderRadius: '50%', background: '#00a88412', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #00a88425' },
+  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 14 },
+  composeInput: { width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 15, outline: 'none', boxSizing: 'border-box', background: '#f9fafb' },
   contactPicker: { border: '1px solid #e5e7eb', borderRadius: 10, overflow: 'hidden' },
   pickerSearch: { display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderBottom: '1px solid #f3f4f6', background: '#f9fafb' },
-  pickerInput: { flex: 1, border: 'none', outline: 'none', fontSize: 13, background: 'transparent', color: '#111827' },
+  pickerInput: { flex: 1, border: 'none', outline: 'none', fontSize: 14, background: 'transparent', color: '#111827' },
   contactOption: { display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid #f9fafb' },
-  miniAvatar: { width: 28, height: 28, borderRadius: '50%', background: '#374151', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 12, flexShrink: 0 },
-  sendNewBtn: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 24px', background: '#e8b931', color: '#111827', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 14, width: '100%', boxShadow: '0 2px 8px rgba(232,185,49,0.25)' },
+  miniAvatar: { width: 28, height: 28, borderRadius: '50%', background: '#374151', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 13, flexShrink: 0 },
+  sendNewBtn: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 24px', background: WA_GREEN, color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 15, width: '100%', boxShadow: '0 2px 8px rgba(0,168,132,0.25)' },
   msgDeleteBtn: { background: 'white', border: '1px solid #e5e7eb', borderRadius: '50%', width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#ef4444', flexShrink: 0 },
   chatMenu: { position: 'absolute', top: '100%', right: 0, marginTop: 4, background: 'white', border: '1px solid #e5e7eb', borderRadius: 10, boxShadow: '0 4px 16px rgba(0,0,0,0.1)', zIndex: 20, minWidth: 150, overflow: 'hidden' },
-  chatMenuItem: { display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '10px 14px', background: 'white', border: 'none', cursor: 'pointer', fontSize: 13, color: '#ef4444', textAlign: 'left' },
+  chatMenuItem: { display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '10px 14px', background: 'white', border: 'none', cursor: 'pointer', fontSize: 14, color: '#ef4444', textAlign: 'left' },
 };
 
 export default Inbox;

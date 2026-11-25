@@ -102,7 +102,7 @@ server {
     }
 
     location /api/ {
-        proxy_pass http://localhost:3001/api/;
+        proxy_pass http://localhost:4001/api/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;   # needed for the WhatsApp chat Socket.IO connection
         proxy_set_header Connection "upgrade";
@@ -110,7 +110,7 @@ server {
     }
 
     location /socket.io/ {
-        proxy_pass http://localhost:3001/socket.io/;
+        proxy_pass http://localhost:4001/socket.io/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";

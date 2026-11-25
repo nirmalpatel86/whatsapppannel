@@ -87,18 +87,20 @@ const SmsTemplates = () => {
     <div style={{ padding: '24px 28px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 22, fontWeight: 700 }}>SMS Templates</h2>
-          <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>{templates.length} templates</p>
+          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 24, fontWeight: 700 }}>SMS Templates</h2>
+          <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>{templates.length} templates</p>
         </div>
         <button onClick={openCreate} style={styles.primaryBtn}><FiPlus size={18} /> New Template</button>
       </div>
 
       {showCreate && (
-        <div style={styles.createPanel}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#111827' }}>{editItem ? 'Edit Template' : 'Create Template'}</h3>
-            <button onClick={() => setShowCreate(false)} style={styles.iconBtn}><FiX size={16} /></button>
+        <div style={styles.modalOverlay} onClick={() => setShowCreate(false)}>
+        <div style={styles.modal} onClick={e => e.stopPropagation()}>
+          <div style={styles.modalHeader}>
+            <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#111827' }}>{editItem ? 'Edit Template' : 'Create Template'}</h3>
+            <button onClick={() => setShowCreate(false)} style={{ ...styles.iconBtn, padding: 6, borderRadius: 8, background: '#f3f4f6' }}><FiX size={18} /></button>
           </div>
+          <div style={styles.modalBody}>
           <div style={styles.formGrid}>
             <div style={styles.field}>
               <label style={styles.label}>Name *</label>
@@ -138,17 +140,19 @@ const SmsTemplates = () => {
           <div style={{ ...styles.field, marginBottom: 14 }}>
             <label style={styles.label}>Message Body *</label>
             <textarea value={form.body} onChange={e => setForm(f => ({ ...f, body: e.target.value }))} style={{ ...styles.input, minHeight: 100, resize: 'vertical' }} placeholder="Type your template message..." />
-            <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>{form.body.length} chars</div>
+            <div style={{ fontSize: 13, color: '#9ca3af', marginTop: 4 }}>{form.body.length} chars</div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 14 }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', cursor: 'pointer' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 15, color: '#374151', cursor: 'pointer' }}>
               <input type="checkbox" checked={form.isUnicode} onChange={e => setForm(f => ({ ...f, isUnicode: e.target.checked }))} /> Unicode
             </label>
           </div>
-          <div style={{ display: 'flex', gap: 12 }}>
-            <button onClick={saveTemplate} style={styles.primaryBtn}>{editItem ? 'Update Template' : 'Create Template'}</button>
-            <button onClick={() => setShowCreate(false)} style={styles.secondaryBtn}>Cancel</button>
           </div>
+          <div style={styles.modalFooter}>
+            <button onClick={() => setShowCreate(false)} style={styles.secondaryBtn}>Cancel</button>
+            <button onClick={saveTemplate} style={styles.primaryBtn}>{editItem ? 'Update Template' : 'Create Template'}</button>
+          </div>
+        </div>
         </div>
       )}
 
@@ -159,11 +163,11 @@ const SmsTemplates = () => {
             <div key={t.id} style={styles.card}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
                 <div>
-                  <h4 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 600, color: '#111827' }}>{t.name}</h4>
+                  <h4 style={{ margin: '0 0 4px', fontSize: 17, fontWeight: 600, color: '#111827' }}>{t.name}</h4>
                   <div style={{ display: 'flex', gap: 6 }}>
-                    <span style={{ padding: '2px 8px', borderRadius: 10, fontSize: 11, fontWeight: 600, background: sc.bg, color: sc.color }}>{t.status}</span>
-                    <span style={{ padding: '2px 8px', borderRadius: 10, fontSize: 11, fontWeight: 500, background: '#f3f4f6', color: '#6b7280' }}>{t.templateType}</span>
-                    {t.isUnicode && <span style={{ padding: '2px 8px', borderRadius: 10, fontSize: 11, fontWeight: 500, background: '#ede9fe', color: '#7c3aed' }}>Unicode</span>}
+                    <span style={{ padding: '2px 8px', borderRadius: 10, fontSize: 13, fontWeight: 600, background: sc.bg, color: sc.color }}>{t.status}</span>
+                    <span style={{ padding: '2px 8px', borderRadius: 10, fontSize: 13, fontWeight: 500, background: '#f3f4f6', color: '#6b7280' }}>{t.templateType}</span>
+                    {t.isUnicode && <span style={{ padding: '2px 8px', borderRadius: 10, fontSize: 13, fontWeight: 500, background: '#ede9fe', color: '#7c3aed' }}>Unicode</span>}
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: 4 }}>
@@ -171,8 +175,8 @@ const SmsTemplates = () => {
                   <button onClick={() => deleteTemplate(t.id, t.name)} style={styles.actionBtn}><FiTrash2 size={14} color="#ef4444" /></button>
                 </div>
               </div>
-              <div style={{ background: '#f9fafb', borderRadius: 8, padding: 12, fontSize: 13, color: '#374151', maxHeight: 80, overflow: 'hidden', lineHeight: 1.5 }}>{t.body}</div>
-              <div style={{ display: 'flex', gap: 12, marginTop: 10, fontSize: 11, color: '#9ca3af' }}>
+              <div style={{ background: '#f9fafb', borderRadius: 8, padding: 12, fontSize: 15, color: '#374151', maxHeight: 80, overflow: 'hidden', lineHeight: 1.5 }}>{t.body}</div>
+              <div style={{ display: 'flex', gap: 12, marginTop: 10, fontSize: 13, color: '#9ca3af' }}>
                 {t.SmsSenderId && <span>Sender: {t.SmsSenderId.senderId}</span>}
                 {t.SmsRoute && <span>Route: {t.SmsRoute.name}</span>}
                 {t.dltContentId && <span>DLT: {t.dltContentId}</span>}
@@ -192,14 +196,18 @@ const SmsTemplates = () => {
 };
 
 const styles = {
-  primaryBtn: { display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: '#3B82F6', color: '#ffffff', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 14, boxShadow: '0 2px 8px rgba(59,130,246,0.25)' },
-  secondaryBtn: { padding: '10px 20px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 14 },
+  primaryBtn: { display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: '#3B82F6', color: '#ffffff', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 16, boxShadow: '0 2px 8px rgba(59,130,246,0.25)' },
+  secondaryBtn: { padding: '10px 20px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 16 },
   iconBtn: { background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 4 },
-  createPanel: { background: 'white', borderRadius: 14, padding: 24, marginBottom: 24, boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' },
+  modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' },
+  modal: { background: 'white', borderRadius: 16, width: '100%', maxWidth: 640, boxShadow: '0 20px 60px rgba(0,0,0,0.15)', overflow: 'hidden', maxHeight: '90vh', display: 'flex', flexDirection: 'column' },
+  modalHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '20px 24px', borderBottom: '1px solid #f3f4f6', flexShrink: 0 },
+  modalBody: { padding: '20px 24px', overflow: 'auto', flex: 1 },
+  modalFooter: { display: 'flex', justifyContent: 'flex-end', gap: 12, padding: '16px 24px', borderTop: '1px solid #f3f4f6', background: '#f9fafb', flexShrink: 0 },
   formGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 16 },
   field: { marginBottom: 0 },
-  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 13 },
-  input: { width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#f9fafb' },
+  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 15 },
+  input: { width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 16, outline: 'none', boxSizing: 'border-box', background: '#f9fafb' },
   card: { background: 'white', borderRadius: 14, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' },
   actionBtn: { background: '#f9fafb', border: '1px solid #e5e7eb', cursor: 'pointer', padding: '6px 8px', borderRadius: 8 },
 };

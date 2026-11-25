@@ -103,8 +103,8 @@ const WhatsappAccounts = () => {
     <div style={{ padding: '24px 28px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 22, fontWeight: 700 }}>WhatsApp Accounts</h2>
-          <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>{accounts.length} accounts</p>
+          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 24, fontWeight: 700 }}>WhatsApp Accounts</h2>
+          <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>{accounts.length} accounts</p>
         </div>
         <button onClick={() => setShowCreate(true)} style={styles.primaryBtn}>
           <FiPlus size={18} /> Add Account
@@ -114,7 +114,7 @@ const WhatsappAccounts = () => {
       {showCreate && (
         <div style={styles.createForm}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <span style={{ fontWeight: 600, fontSize: 15, color: '#111827' }}>New Account</span>
+            <span style={{ fontWeight: 600, fontSize: 17, color: '#111827' }}>New Account</span>
             <button onClick={() => setShowCreate(false)} style={styles.iconBtn}><FiX size={16} /></button>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
@@ -136,13 +136,13 @@ const WhatsappAccounts = () => {
             <div key={account.id} style={styles.card}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                  <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 600, color: '#111827' }}>{account.name}</h3>
-                  <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>
+                  <h3 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 600, color: '#111827' }}>{account.name}</h3>
+                  <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>
                     {account.phone || 'Not connected'}
                   </p>
                 </div>
                 <span style={{
-                  padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                  padding: '4px 12px', borderRadius: 20, fontSize: 14, fontWeight: 600,
                   background: sc.bg, color: sc.color,
                 }}>
                   {sc.label}
@@ -151,7 +151,7 @@ const WhatsappAccounts = () => {
 
               {qrCodes[account.id] && (
                 <div style={{ textAlign: 'center', margin: '16px 0', padding: 20, background: '#f9fafb', borderRadius: 12, border: '1px solid #e5e7eb' }}>
-                  <p style={{ margin: '0 0 10px', fontSize: 14, fontWeight: 600, color: '#111827' }}>Scan QR Code</p>
+                  <p style={{ margin: '0 0 10px', fontSize: 16, fontWeight: 600, color: '#111827' }}>Scan QR Code</p>
                   <img
                     src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrCodes[account.id])}`}
                     alt="QR Code"
@@ -189,7 +189,7 @@ const WhatsappAccounts = () => {
         <div style={{ textAlign: 'center', padding: 60, color: '#6b7280' }}>
           <FiSmartphone size={48} style={{ opacity: 0.3, marginBottom: 12 }} />
           <h3 style={{ margin: '0 0 8px', color: '#6b7280' }}>No accounts yet</h3>
-          <p style={{ margin: 0, fontSize: 14 }}>Add a WhatsApp account to get started.</p>
+          <p style={{ margin: 0, fontSize: 16 }}>Add a WhatsApp account to get started.</p>
         </div>
       )}
     </div>
@@ -206,7 +206,7 @@ const styles = {
   primaryBtn: {
     display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px',
     background: '#e8b931', color: '#111827', border: 'none', borderRadius: 10,
-    fontWeight: 600, cursor: 'pointer', fontSize: 14,
+    fontWeight: 600, cursor: 'pointer', fontSize: 16,
     boxShadow: '0 2px 8px rgba(232,185,49,0.25)',
   },
   iconBtn: { background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', padding: 4 },
@@ -216,7 +216,7 @@ const styles = {
   },
   input: {
     flex: 1, padding: '10px 12px', border: '1px solid #e5e7eb',
-    borderRadius: 10, fontSize: 14, outline: 'none', background: '#f9fafb',
+    borderRadius: 10, fontSize: 16, outline: 'none', background: '#f9fafb',
   },
   card: {
     background: 'white', borderRadius: 14, padding: 20,
@@ -225,7 +225,7 @@ const styles = {
   actionBtn: {
     display: 'flex', alignItems: 'center', gap: 4, padding: '7px 14px',
     background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8,
-    cursor: 'pointer', fontSize: 13, fontWeight: 500,
+    cursor: 'pointer', fontSize: 15, fontWeight: 500,
   },
 };
 

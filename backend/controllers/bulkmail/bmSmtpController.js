@@ -37,7 +37,7 @@ exports.create = async (req, res) => {
       ? (req.body.companyId || req.user.companyId)
       : req.user.companyId;
 
-    const { name, host, port, username, password, secure, maxPerHour } = req.body;
+    const { name, host, port, username, password, secure, userId, type, maxPerHour } = req.body;
     if (!host || !username || !password) {
       return res.status(400).json({ error: 'Host, username and password are required' });
     }
@@ -45,6 +45,7 @@ exports.create = async (req, res) => {
     const server = await BmSmtp.create({
       companyId, name: name || host, host, port: port || 587,
       username, password, secure: secure || 'tls',
+      userId: userId || null, type: type || 'general',
       maxPerHour: maxPerHour || 100,
     });
     res.status(201).json({ server });
@@ -64,7 +65,7 @@ exports.update = async (req, res) => {
       }
     }
 
-    const { name, host, port, username, password, secure, maxPerHour, isActive } = req.body;
+    const { name, host, port, username, password, secure, userId, type, maxPerHour, isActive } = req.body;
     await server.update({
       ...(name && { name }),
       ...(host && { host }),
@@ -72,6 +73,8 @@ exports.update = async (req, res) => {
       ...(username && { username }),
       ...(password && { password }),
       ...(secure && { secure }),
+      ...(userId !== undefined && { userId }),
+      ...(type && { type }),
       ...(maxPerHour !== undefined && { maxPerHour }),
       ...(isActive !== undefined && { isActive }),
     });
@@ -85,6 +88,12 @@ exports.test = async (req, res) => {
   try {
     const server = await BmSmtp.findByPk(req.params.id);
     if (!server) return res.status(404).json({ error: 'SMTP server not found' });
+    if (req.user.role !== 'super_admin') {
+      const visibleCompanyIds = await getVisibleCompanyIds(BmUser, req.user);
+      if (!visibleCompanyIds.includes(server.companyId)) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+    }
 
     const transporter = nodemailer.createTransport({
       host: server.host,

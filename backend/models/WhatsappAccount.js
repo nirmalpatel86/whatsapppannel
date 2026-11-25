@@ -48,4 +48,10 @@ const WhatsappAccount = sequelize.define('WhatsappAccount', {
   timestamps: true,
 });
 
+WhatsappAccount.prototype.toJSON = function () {
+  const values = { ...this.get() };
+  delete values.sessionData;
+  return values;
+};
+
 module.exports = WhatsappAccount;

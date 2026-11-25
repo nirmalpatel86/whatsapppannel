@@ -92,8 +92,8 @@ const SmsContacts = () => {
     <div style={{ padding: '24px 28px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 22, fontWeight: 700 }}>SMS Contacts</h2>
-          <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>{total} contacts</p>
+          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 24, fontWeight: 700 }}>SMS Contacts</h2>
+          <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>{total} contacts</p>
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <div style={styles.searchBox}>
@@ -108,8 +108,8 @@ const SmsContacts = () => {
 
       {selected.size > 0 && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 20px', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 12, marginBottom: 16 }}>
-          <span style={{ fontSize: 14, fontWeight: 600, color: '#111827' }}>{selected.size} selected</span>
-          <button onClick={bulkDelete} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 10, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}><FiTrash2 size={14} /> Delete</button>
+          <span style={{ fontSize: 16, fontWeight: 600, color: '#111827' }}>{selected.size} selected</span>
+          <button onClick={bulkDelete} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 10, cursor: 'pointer', fontSize: 15, fontWeight: 600 }}><FiTrash2 size={14} /> Delete</button>
           <button onClick={() => setSelected(new Set())} style={styles.outlineBtn}>Clear</button>
         </div>
       )}
@@ -118,7 +118,7 @@ const SmsContacts = () => {
         <div style={styles.modalOverlay} onClick={() => { setShowAdd(false); setEditItem(null); }}>
           <div style={styles.modal} onClick={e => e.stopPropagation()}>
             <div style={styles.modalHeader}>
-              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' }}>{editItem ? 'Edit Contact' : 'Add Contact'}</h3>
+              <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#111827' }}>{editItem ? 'Edit Contact' : 'Add Contact'}</h3>
               <button onClick={() => { setShowAdd(false); setEditItem(null); }} style={{ background: '#f3f4f6', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 6, borderRadius: 8 }}><FiX size={18} /></button>
             </div>
             <div style={{ padding: '20px 24px' }}>
@@ -127,7 +127,7 @@ const SmsContacts = () => {
                 <div style={styles.field}><label style={styles.label}>Phone *</label><input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} style={styles.input} placeholder="919876543210" disabled={!!editItem} /></div>
                 <div style={styles.field}><label style={styles.label}>Email</label><input value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} style={styles.input} placeholder="email@example.com" /></div>
                 <div style={{ ...styles.field, display: 'flex', alignItems: 'center', paddingTop: 24 }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#374151', cursor: 'pointer' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 15, color: '#374151', cursor: 'pointer' }}>
                     <input type="checkbox" checked={form.isDnd} onChange={e => setForm(f => ({ ...f, isDnd: e.target.checked }))} /> DND (Do Not Disturb)
                   </label>
                 </div>
@@ -145,18 +145,18 @@ const SmsContacts = () => {
         <div style={styles.modalOverlay} onClick={() => setShowBulk(false)}>
           <div style={{ ...styles.modal, maxWidth: 520 }} onClick={e => e.stopPropagation()}>
             <div style={styles.modalHeader}>
-              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' }}>Bulk Upload</h3>
+              <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#111827' }}>Bulk Upload</h3>
               <button onClick={() => setShowBulk(false)} style={{ background: '#f3f4f6', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 6, borderRadius: 8 }}><FiX size={18} /></button>
             </div>
             <div style={{ padding: '20px 24px' }}>
               <div style={{ background: '#f9fafb', border: '2px dashed #d1d5db', borderRadius: 12, padding: 24, textAlign: 'center' }}>
                 <input ref={bulkRef} type="file" accept=".csv" onChange={e => { setBulkFile(e.target.files[0] || null); setBulkResult(null); }} style={{ display: 'none' }} />
                 <button onClick={() => bulkRef.current?.click()} style={styles.outlineBtn}>Choose CSV File</button>
-                {bulkFile && <div style={{ marginTop: 10, fontSize: 13, color: '#111827' }}>{bulkFile.name} ({(bulkFile.size / 1024).toFixed(1)} KB)</div>}
+                {bulkFile && <div style={{ marginTop: 10, fontSize: 15, color: '#111827' }}>{bulkFile.name} ({(bulkFile.size / 1024).toFixed(1)} KB)</div>}
               </div>
               {bulkResult && (
                 <div style={{ marginTop: 16, padding: 16, background: bulkResult.imported > 0 ? '#f0fdf4' : '#fef2f2', borderRadius: 12, border: `1px solid ${bulkResult.imported > 0 ? '#bbf7d0' : '#fecaca'}` }}>
-                  <div style={{ fontSize: 13 }}>Imported: <b>{bulkResult.imported}</b> | Skipped: <b>{bulkResult.skipped}</b></div>
+                  <div style={{ fontSize: 15 }}>Imported: <b>{bulkResult.imported}</b> | Skipped: <b>{bulkResult.skipped}</b></div>
                 </div>
               )}
             </div>
@@ -193,9 +193,9 @@ const SmsContacts = () => {
                   </button>
                 </td>
                 <td style={styles.td}><span style={{ fontWeight: 500, color: '#111827' }}>{c.name || '-'}</span></td>
-                <td style={{ ...styles.td, fontFamily: 'monospace', fontSize: 13, color: '#6b7280' }}>{c.phone}</td>
-                <td style={{ ...styles.td, color: '#6b7280', fontSize: 13 }}>{c.email || '-'}</td>
-                <td style={styles.td}>{c.isDnd ? <span style={{ color: '#ef4444', fontWeight: 600, fontSize: 12 }}>DND</span> : '-'}</td>
+                <td style={{ ...styles.td, fontFamily: 'monospace', fontSize: 15, color: '#6b7280' }}>{c.phone}</td>
+                <td style={{ ...styles.td, color: '#6b7280', fontSize: 15 }}>{c.email || '-'}</td>
+                <td style={styles.td}>{c.isDnd ? <span style={{ color: '#ef4444', fontWeight: 600, fontSize: 14 }}>DND</span> : '-'}</td>
                 <td style={styles.td}>
                   <div style={{ display: 'flex', gap: 6 }}>
                     <button onClick={() => openEdit(c)} style={styles.actionBtn}><FiEdit2 size={14} color="#3B82F6" /></button>
@@ -217,7 +217,7 @@ const SmsContacts = () => {
       {totalPages > 1 && (
         <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 16 }}>
           <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} style={styles.pageBtn}>Prev</button>
-          <span style={{ padding: '8px 16px', color: '#6b7280', fontSize: 13 }}>Page {page} of {totalPages}</span>
+          <span style={{ padding: '8px 16px', color: '#6b7280', fontSize: 15 }}>Page {page} of {totalPages}</span>
           <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} style={styles.pageBtn}>Next</button>
         </div>
       )}
@@ -226,22 +226,22 @@ const SmsContacts = () => {
 };
 
 const styles = {
-  primaryBtn: { display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: '#3B82F6', color: '#ffffff', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 14, boxShadow: '0 2px 8px rgba(59,130,246,0.25)' },
-  outlineBtn: { display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 14 },
+  primaryBtn: { display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: '#3B82F6', color: '#ffffff', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 16, boxShadow: '0 2px 8px rgba(59,130,246,0.25)' },
+  outlineBtn: { display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 16 },
   searchBox: { display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px', background: 'white', borderRadius: 10, border: '1px solid #e5e7eb' },
-  searchInput: { border: 'none', outline: 'none', fontSize: 13, width: 180, color: '#111827' },
+  searchInput: { border: 'none', outline: 'none', fontSize: 15, width: 180, color: '#111827' },
   modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' },
   modal: { background: 'white', borderRadius: 16, width: '100%', maxWidth: 580, boxShadow: '0 20px 60px rgba(0,0,0,0.15)', overflow: 'hidden' },
   modalHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', borderBottom: '1px solid #f3f4f6' },
   field: { marginBottom: 0 },
-  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 13 },
-  input: { width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#f9fafb' },
+  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 15 },
+  input: { width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 16, outline: 'none', boxSizing: 'border-box', background: '#f9fafb' },
   tableWrapper: { background: 'white', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' },
   table: { width: '100%', borderCollapse: 'collapse' },
-  th: { textAlign: 'left', padding: '12px 16px', borderBottom: '2px solid #f3f4f6', fontSize: 11, fontWeight: 600, color: '#9ca3af', background: '#f9fafb', textTransform: 'uppercase', letterSpacing: 0.5 },
-  td: { padding: '12px 16px', fontSize: 14 },
+  th: { textAlign: 'left', padding: '12px 16px', borderBottom: '2px solid #f3f4f6', fontSize: 13, fontWeight: 600, color: '#9ca3af', background: '#f9fafb', textTransform: 'uppercase', letterSpacing: 0.5 },
+  td: { padding: '12px 16px', fontSize: 16 },
   actionBtn: { background: '#f9fafb', border: '1px solid #e5e7eb', cursor: 'pointer', padding: '6px 8px', borderRadius: 8 },
-  pageBtn: { padding: '8px 16px', background: 'white', border: '1px solid #e5e7eb', borderRadius: 8, cursor: 'pointer', fontSize: 13 },
+  pageBtn: { padding: '8px 16px', background: 'white', border: '1px solid #e5e7eb', borderRadius: 8, cursor: 'pointer', fontSize: 15 },
 };
 
 export default SmsContacts;

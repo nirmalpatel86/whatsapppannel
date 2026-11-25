@@ -70,11 +70,13 @@ const SmsRoutes = () => {
   if (loading) return <div style={{ padding: 28, color: '#6b7280' }}>Loading...</div>;
 
   const formPanel = (isEdit) => (
-    <div style={styles.createPanel}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#111827' }}>{isEdit ? 'Edit Route' : 'Add Route'}</h3>
-        <button onClick={() => { isEdit ? setEditItem(null) : setShowCreate(false); resetForm(); }} style={styles.iconBtn}><FiX size={16} /></button>
+    <div style={styles.modalOverlay} onClick={() => { (isEdit ? setEditItem(null) : setShowCreate(false)); resetForm(); }}>
+    <div style={styles.modal} onClick={e => e.stopPropagation()}>
+      <div style={styles.modalHeader}>
+        <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#111827' }}>{isEdit ? 'Edit Route' : 'Add Route'}</h3>
+        <button onClick={() => { isEdit ? setEditItem(null) : setShowCreate(false); resetForm(); }} style={{ ...styles.iconBtn, padding: 6, borderRadius: 8, background: '#f3f4f6' }}><FiX size={18} /></button>
       </div>
+      <div style={styles.modalBody}>
       <div style={styles.formGrid}>
         <div style={styles.field}>
           <label style={styles.label}>Route Name *</label>
@@ -116,10 +118,12 @@ const SmsRoutes = () => {
         <label style={styles.label}>DLR URL</label>
         <input value={form.dlrUrl} onChange={e => setForm({ ...form, dlrUrl: e.target.value })} style={styles.input} placeholder="Delivery report callback URL" />
       </div>
-      <div style={{ display: 'flex', gap: 12 }}>
-        <button onClick={isEdit ? saveEdit : createRoute} style={styles.primaryBtn}>{isEdit ? 'Save Changes' : 'Create Route'}</button>
-        <button onClick={() => { isEdit ? setEditItem(null) : setShowCreate(false); resetForm(); }} style={styles.secondaryBtn}>Cancel</button>
       </div>
+      <div style={styles.modalFooter}>
+        <button onClick={() => { isEdit ? setEditItem(null) : setShowCreate(false); resetForm(); }} style={styles.secondaryBtn}>Cancel</button>
+        <button onClick={isEdit ? saveEdit : createRoute} style={styles.primaryBtn}>{isEdit ? 'Save Changes' : 'Create Route'}</button>
+      </div>
+    </div>
     </div>
   );
 
@@ -127,8 +131,8 @@ const SmsRoutes = () => {
     <div style={{ padding: '24px 28px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 22, fontWeight: 700 }}>SMS Routes</h2>
-          <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>{routes.length} routes configured</p>
+          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 24, fontWeight: 700 }}>SMS Routes</h2>
+          <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>{routes.length} routes configured</p>
         </div>
         <button onClick={() => { setShowCreate(true); setEditItem(null); resetForm(); }} style={styles.primaryBtn}>
           <FiPlus size={18} /> Add Route
@@ -143,23 +147,23 @@ const SmsRoutes = () => {
           <div key={r.id} style={styles.card}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>
-                <h3 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 600, color: '#111827' }}>{r.name}</h3>
+                <h3 style={{ margin: '0 0 4px', fontSize: 17, fontWeight: 600, color: '#111827' }}>{r.name}</h3>
                 <span style={{
-                  padding: '3px 10px', borderRadius: 12, fontSize: 11, fontWeight: 600,
+                  padding: '3px 10px', borderRadius: 12, fontSize: 13, fontWeight: 600,
                   background: (typeColors[r.routeType] || '#6b7280') + '15',
                   color: typeColors[r.routeType] || '#6b7280', textTransform: 'uppercase',
                 }}>{r.routeType}</span>
               </div>
               <span style={{
-                padding: '4px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600,
+                padding: '4px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600,
                 background: r.isActive ? '#dcfce7' : '#fef2f2',
                 color: r.isActive ? '#16a34a' : '#dc2626',
               }}>{r.isActive ? 'Active' : 'Inactive'}</span>
             </div>
-            <div style={{ marginTop: 12, fontSize: 13, color: '#6b7280' }}>
+            <div style={{ marginTop: 12, fontSize: 15, color: '#6b7280' }}>
               {r.smscId && <div>SMSC: <strong>{r.smscId}</strong></div>}
               <div>Cost: <strong style={{ color: ACCENT }}>₹{(r.costPerSms || 0).toFixed(3)}/SMS</strong></div>
-              {r.apiUrl && <div style={{ marginTop: 4, fontSize: 12, color: '#9ca3af', wordBreak: 'break-all' }}>{r.apiUrl}</div>}
+              {r.apiUrl && <div style={{ marginTop: 4, fontSize: 14, color: '#9ca3af', wordBreak: 'break-all' }}>{r.apiUrl}</div>}
             </div>
             <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
               <button onClick={() => openEdit(r)} style={{ ...styles.actionBtn, color: ACCENT }}><FiEdit2 size={14} /> Edit</button>
@@ -173,7 +177,7 @@ const SmsRoutes = () => {
         <div style={{ textAlign: 'center', padding: 60, color: '#9ca3af' }}>
           <FiWifi size={48} style={{ opacity: 0.3, marginBottom: 12 }} />
           <h3 style={{ color: '#6b7280', margin: '0 0 8px' }}>No routes configured</h3>
-          <p style={{ margin: 0, fontSize: 14 }}>Add an SMS gateway route to start sending messages.</p>
+          <p style={{ margin: 0, fontSize: 16 }}>Add an SMS gateway route to start sending messages.</p>
         </div>
       )}
     </div>
@@ -181,16 +185,20 @@ const SmsRoutes = () => {
 };
 
 const styles = {
-  primaryBtn: { display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: ACCENT, color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 14, boxShadow: `0 2px 8px ${ACCENT}40` },
-  secondaryBtn: { padding: '10px 20px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 14 },
+  primaryBtn: { display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: ACCENT, color: 'white', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 16, boxShadow: `0 2px 8px ${ACCENT}40` },
+  secondaryBtn: { padding: '10px 20px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 16 },
   iconBtn: { background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 4 },
-  createPanel: { background: 'white', borderRadius: 14, padding: 24, marginBottom: 24, boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' },
+  modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' },
+  modal: { background: 'white', borderRadius: 16, width: '100%', maxWidth: 620, boxShadow: '0 20px 60px rgba(0,0,0,0.15)', overflow: 'hidden', maxHeight: '90vh', display: 'flex', flexDirection: 'column' },
+  modalHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '20px 24px', borderBottom: '1px solid #f3f4f6', flexShrink: 0 },
+  modalBody: { padding: '20px 24px', overflow: 'auto', flex: 1 },
+  modalFooter: { display: 'flex', justifyContent: 'flex-end', gap: 12, padding: '16px 24px', borderTop: '1px solid #f3f4f6', background: '#f9fafb', flexShrink: 0 },
   formGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 16 },
   field: { marginBottom: 12 },
-  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 13 },
-  input: { width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#f9fafb' },
+  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 15 },
+  input: { width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 16, outline: 'none', boxSizing: 'border-box', background: '#f9fafb' },
   card: { background: 'white', borderRadius: 14, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' },
-  actionBtn: { display: 'flex', alignItems: 'center', gap: 4, padding: '6px 12px', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 500 },
+  actionBtn: { display: 'flex', alignItems: 'center', gap: 4, padding: '6px 12px', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 8, cursor: 'pointer', fontSize: 15, fontWeight: 500 },
 };
 
 export default SmsRoutes;

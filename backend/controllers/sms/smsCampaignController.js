@@ -107,15 +107,27 @@ exports.create = async (req, res) => {
 
     const {
       name, templateId, senderIdId, routeId, message,
-      recipients, groupIds, scheduledAt, delayBetweenMessages,
+      recipients, groupId, groupIds, scheduledAt, delayBetweenMessages,
       messageType, dltContentId, entityId,
     } = req.body;
 
+    // The campaigns UI sends a single groupId; accept a plural groupIds too
+    // for API-style callers that pass an array.
+    const resolvedGroupIds = groupIds && groupIds.length ? groupIds : (groupId ? [groupId] : []);
+
     let allRecipients = recipients || [];
 
-    if (groupIds && groupIds.length > 0) {
+    // "Auto" route in the UI means pick one automatically rather than leaving it
+    // unset — otherwise /start always fails later with "No route assigned".
+    let resolvedRouteId = routeId || null;
+    if (!resolvedRouteId) {
+      const autoRoute = await SmsRoute.findOne({ where: { isActive: true }, order: [['costPerSms', 'ASC']] });
+      if (autoRoute) resolvedRouteId = autoRoute.id;
+    }
+
+    if (resolvedGroupIds.length > 0) {
       const groups = await SmsContactGroup.findAll({
-        where: { id: groupIds, companyId },
+        where: { id: resolvedGroupIds, companyId },
         include: [{ model: SmsContact, attributes: ['phone'] }],
       });
       for (const group of groups) {
@@ -131,7 +143,7 @@ exports.create = async (req, res) => {
       name,
       templateId: templateId || null,
       senderIdId: senderIdId || null,
-      routeId: routeId || null,
+      routeId: resolvedRouteId,
       message,
       recipients: allRecipients,
       totalRecipients: allRecipients.length,
@@ -201,6 +213,12 @@ exports.pause = async (req, res) => {
   try {
     const campaign = await SmsCampaign.findByPk(req.params.id);
     if (!campaign) return res.status(404).json({ error: 'Campaign not found' });
+    if (req.user.role !== 'super_admin') {
+      const visibleCompanyIds = await getVisibleCompanyIds(SmsUser, req.user);
+      if (!visibleCompanyIds.includes(campaign.companyId)) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+    }
     if (campaign.status !== 'running') {
       return res.status(400).json({ error: 'Campaign is not running' });
     }
@@ -338,3 +356,5 @@ async function runSmsCampaign(campaignId) {
     deliveredCount,
   });
 }
+
+exports.runSmsCampaign = runSmsCampaign;

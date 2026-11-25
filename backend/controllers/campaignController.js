@@ -136,6 +136,12 @@ exports.pause = async (req, res) => {
   try {
     const campaign = await Campaign.findByPk(req.params.id);
     if (!campaign) return res.status(404).json({ error: 'Campaign not found' });
+    if (req.user.role !== 'super_admin') {
+      const visibleCompanyIds = await getVisibleCompanyIds(User, req.user);
+      if (!visibleCompanyIds.includes(campaign.companyId)) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+    }
     if (campaign.status !== 'running') {
       return res.status(400).json({ error: 'Campaign is not running' });
     }

@@ -45,7 +45,9 @@ const SmsApiKey = smsSequelize.define('SmsApiKey', {
   timestamps: true,
   tableName: 'sms_api_keys',
   hooks: {
-    beforeCreate: (apiKey) => {
+    // Must run before validation (not beforeCreate) — apiKey is NOT NULL, and
+    // Sequelize validates required fields before beforeCreate hooks ever run.
+    beforeValidate: (apiKey) => {
       if (!apiKey.apiKey) {
         apiKey.apiKey = crypto.randomBytes(32).toString('hex');
       }

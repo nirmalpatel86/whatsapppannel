@@ -47,27 +47,27 @@ const SmsReports = () => {
   return (
     <div style={{ padding: '24px 28px' }}>
       <div style={{ marginBottom: 24 }}>
-        <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 22, fontWeight: 700 }}>SMS Reports</h2>
-        <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>Campaign delivery reports</p>
+        <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 24, fontWeight: 700 }}>SMS Reports</h2>
+        <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>Campaign delivery reports</p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '340px 1fr', gap: 20 }}>
         <div style={styles.card}>
-          <h3 style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 600, color: '#111827' }}>Campaigns</h3>
+          <h3 style={{ margin: '0 0 12px', fontSize: 17, fontWeight: 600, color: '#111827' }}>Campaigns</h3>
           <div style={{ maxHeight: 500, overflow: 'auto' }}>
             {campaigns.map(c => (
               <div key={c.id} onClick={() => viewReport(c)} style={{ ...styles.campaignItem, borderColor: selectedCampaign?.id === c.id ? '#3B82F6' : '#e5e7eb', background: selectedCampaign?.id === c.id ? '#eff6ff' : 'white' }}>
-                <div style={{ fontWeight: 500, fontSize: 14, color: '#111827' }}>{c.name}</div>
-                <div style={{ display: 'flex', gap: 12, fontSize: 12, color: '#6b7280', marginTop: 4 }}>
+                <div style={{ fontWeight: 500, fontSize: 16, color: '#111827' }}>{c.name}</div>
+                <div style={{ display: 'flex', gap: 12, fontSize: 14, color: '#6b7280', marginTop: 4 }}>
                   <span>Sent: {c.sentCount || 0}</span>
                   <span style={{ color: '#059669' }}>Delivered: {c.deliveredCount || 0}</span>
                   <span style={{ color: '#ef4444' }}>Failed: {c.failedCount || 0}</span>
                 </div>
-                <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>{new Date(c.createdAt).toLocaleDateString('en-IN')}</div>
+                <div style={{ fontSize: 13, color: '#9ca3af', marginTop: 4 }}>{new Date(c.createdAt).toLocaleDateString('en-IN')}</div>
               </div>
             ))}
             {campaigns.length === 0 && !loading && (
-              <p style={{ color: '#9ca3af', fontSize: 13, textAlign: 'center', padding: 20 }}>No campaigns</p>
+              <p style={{ color: '#9ca3af', fontSize: 15, textAlign: 'center', padding: 20 }}>No campaigns</p>
             )}
           </div>
         </div>
@@ -82,8 +82,8 @@ const SmsReports = () => {
             <>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                 <div>
-                  <h3 style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 600, color: '#111827' }}>{selectedCampaign.name}</h3>
-                  <div style={{ display: 'flex', gap: 16, fontSize: 13 }}>
+                  <h3 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 600, color: '#111827' }}>{selectedCampaign.name}</h3>
+                  <div style={{ display: 'flex', gap: 16, fontSize: 15 }}>
                     <span>Total: <b>{selectedCampaign.totalRecipients}</b></span>
                     <span style={{ color: '#059669' }}>Delivered: <b>{selectedCampaign.deliveredCount}</b></span>
                     <span style={{ color: '#ef4444' }}>Failed: <b>{selectedCampaign.failedCount}</b></span>
@@ -118,12 +118,12 @@ const SmsReports = () => {
                       const sc = statusColors[m.status] || statusColors.pending;
                       return (
                         <tr key={m.id || i} style={{ borderBottom: '1px solid #f3f4f6' }}>
-                          <td style={styles.td}><span style={{ fontFamily: 'monospace', fontSize: 13 }}>{m.phone}</span></td>
+                          <td style={styles.td}><span style={{ fontFamily: 'monospace', fontSize: 15 }}>{m.phone}</span></td>
                           <td style={styles.td}>
-                            <span style={{ padding: '2px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600, background: sc.bg, color: sc.color }}>{m.status}</span>
+                            <span style={{ padding: '2px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600, background: sc.bg, color: sc.color }}>{m.status}</span>
                           </td>
-                          <td style={{ ...styles.td, fontSize: 12, color: '#9ca3af' }}>{m.sentAt ? new Date(m.sentAt).toLocaleString('en-IN') : '-'}</td>
-                          <td style={{ ...styles.td, fontSize: 12, color: '#9ca3af' }}>{m.deliveredAt ? new Date(m.deliveredAt).toLocaleString('en-IN') : '-'}</td>
+                          <td style={{ ...styles.td, fontSize: 14, color: '#9ca3af' }}>{m.sentAt ? new Date(m.sentAt).toLocaleString('en-IN') : '-'}</td>
+                          <td style={{ ...styles.td, fontSize: 14, color: '#9ca3af' }}>{m.deliveredAt ? new Date(m.deliveredAt).toLocaleString('en-IN') : '-'}</td>
                         </tr>
                       );
                     })}
@@ -144,9 +144,9 @@ const styles = {
   card: { background: 'white', borderRadius: 14, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' },
   campaignItem: { padding: 12, border: '2px solid #e5e7eb', borderRadius: 10, marginBottom: 8, cursor: 'pointer' },
   searchBox: { display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px', background: '#f9fafb', borderRadius: 10, border: '1px solid #e5e7eb' },
-  searchInput: { border: 'none', outline: 'none', fontSize: 13, width: 150, color: '#111827', background: 'transparent' },
-  th: { textAlign: 'left', padding: '10px 14px', borderBottom: '2px solid #f3f4f6', fontSize: 11, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 0.5 },
-  td: { padding: '10px 14px', fontSize: 13, color: '#374151' },
+  searchInput: { border: 'none', outline: 'none', fontSize: 15, width: 150, color: '#111827', background: 'transparent' },
+  th: { textAlign: 'left', padding: '10px 14px', borderBottom: '2px solid #f3f4f6', fontSize: 13, fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 0.5 },
+  td: { padding: '10px 14px', fontSize: 15, color: '#374151' },
 };
 
 export default SmsReports;

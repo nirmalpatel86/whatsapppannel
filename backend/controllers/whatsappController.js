@@ -98,6 +98,16 @@ exports.getStatus = async (req, res) => {
   try {
     const account = await WhatsappAccount.findByPk(req.params.id);
     if (!account) return res.status(404).json({ error: 'Account not found' });
+
+    if (req.user.role === 'user' && account.createdBy !== req.user.id) {
+      return res.status(403).json({ error: 'Access denied' });
+    } else if (req.user.role !== 'super_admin' && req.user.role !== 'user') {
+      const visibleCompanyIds = await getVisibleCompanyIds(User, req.user);
+      if (!visibleCompanyIds.includes(account.companyId)) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+    }
+
     res.json({ status: account.status, phone: account.phone });
   } catch (err) {
     res.status(500).json({ error: err.message });

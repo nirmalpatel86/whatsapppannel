@@ -48,4 +48,11 @@ const Company = sequelize.define('Company', {
   timestamps: true,
 });
 
+Company.prototype.toJSON = function () {
+  const values = { ...this.get() };
+  delete values.metaAccessToken;
+  delete values.metaWebhookSecret;
+  return values;
+};
+
 module.exports = Company;

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../../services/api';
 import alert from '../../utils/alert';
-import { FiDollarSign, FiArrowUp, FiArrowDown, FiFilter } from 'react-icons/fi';
+import { FiCreditCard, FiArrowUp, FiArrowDown, FiFilter } from 'react-icons/fi';
 
 const ACCENT = '#3B82F6';
 
@@ -35,8 +35,8 @@ const SmsTransactions = () => {
     <div style={{ padding: '24px 28px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 22, fontWeight: 700 }}>SMS Transactions</h2>
-          <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>Wallet transaction history</p>
+          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 24, fontWeight: 700 }}>SMS Transactions</h2>
+          <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>Wallet transaction history</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <FiFilter size={14} color="#6b7280" />
@@ -76,7 +76,7 @@ const SmsTransactions = () => {
                         : <FiArrowUp size={14} color={typeColors[t.type]} />}
                     </div>
                     <span style={{
-                      padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600,
+                      padding: '3px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600,
                       background: (typeColors[t.type] || '#6b7280') + '15',
                       color: typeColors[t.type] || '#6b7280', textTransform: 'capitalize',
                     }}>{t.type}</span>
@@ -86,11 +86,11 @@ const SmsTransactions = () => {
                   {t.type === 'recharge' || t.type === 'refund' ? '+' : '-'}{t.amount} SMS
                 </td>
                 <td style={{ ...styles.td, color: '#6b7280' }}>{t.balanceAfter} SMS</td>
-                <td style={{ ...styles.td, color: '#374151', fontSize: 13, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <td style={{ ...styles.td, color: '#374151', fontSize: 15, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {t.description || '-'}
                 </td>
-                <td style={{ ...styles.td, color: '#9ca3af', fontSize: 13 }}>{t.reference || '-'}</td>
-                <td style={{ ...styles.td, color: '#6b7280', fontSize: 13 }}>
+                <td style={{ ...styles.td, color: '#9ca3af', fontSize: 15 }}>{t.reference || '-'}</td>
+                <td style={{ ...styles.td, color: '#6b7280', fontSize: 15 }}>
                   {new Date(t.createdAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                 </td>
               </tr>
@@ -99,7 +99,7 @@ const SmsTransactions = () => {
         </table>
         {transactions.length === 0 && !loading && (
           <div style={{ padding: 60, textAlign: 'center', color: '#9ca3af' }}>
-            <FiDollarSign size={36} style={{ opacity: 0.3, marginBottom: 8 }} />
+            <FiCreditCard size={36} style={{ opacity: 0.3, marginBottom: 8 }} />
             <p style={{ margin: '0 0 4px', fontWeight: 500, color: '#6b7280' }}>No transactions found</p>
           </div>
         )}
@@ -108,7 +108,7 @@ const SmsTransactions = () => {
       {totalPages > 1 && (
         <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 16 }}>
           <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} style={styles.pageBtn}>Prev</button>
-          <span style={{ padding: '8px 16px', color: '#6b7280', fontSize: 13 }}>Page {page} of {totalPages}</span>
+          <span style={{ padding: '8px 16px', color: '#6b7280', fontSize: 15 }}>Page {page} of {totalPages}</span>
           <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} style={styles.pageBtn}>Next</button>
         </div>
       )}
@@ -117,13 +117,13 @@ const SmsTransactions = () => {
 };
 
 const styles = {
-  filterSelect: { padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 13, background: 'white', color: '#374151', outline: 'none' },
+  filterSelect: { padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: 15, background: 'white', color: '#374151', outline: 'none' },
   tableWrapper: { background: 'white', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' },
   table: { width: '100%', borderCollapse: 'collapse' },
-  th: { textAlign: 'left', padding: '12px 16px', borderBottom: '2px solid #f3f4f6', fontSize: 11, fontWeight: 600, color: '#9ca3af', background: '#f9fafb', textTransform: 'uppercase', letterSpacing: 0.5 },
+  th: { textAlign: 'left', padding: '12px 16px', borderBottom: '2px solid #f3f4f6', fontSize: 13, fontWeight: 600, color: '#9ca3af', background: '#f9fafb', textTransform: 'uppercase', letterSpacing: 0.5 },
   tr: { borderBottom: '1px solid #f3f4f6' },
-  td: { padding: '12px 16px', fontSize: 14 },
-  pageBtn: { padding: '8px 16px', background: 'white', border: '1px solid #e5e7eb', borderRadius: 8, cursor: 'pointer', fontSize: 13 },
+  td: { padding: '12px 16px', fontSize: 16 },
+  pageBtn: { padding: '8px 16px', background: 'white', border: '1px solid #e5e7eb', borderRadius: 8, cursor: 'pointer', fontSize: 15 },
 };
 
 export default SmsTransactions;

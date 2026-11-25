@@ -112,8 +112,8 @@ const Users = () => {
     <div style={{ padding: '24px 28px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 22, fontWeight: 700 }}>Users</h2>
-          <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>{users.length} users</p>
+          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 24, fontWeight: 700 }}>Users</h2>
+          <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>{users.length} users</p>
         </div>
         <button onClick={() => setShowCreate(true)} style={styles.primaryBtn}>
           <FiPlus size={18} /> Add User
@@ -124,7 +124,7 @@ const Users = () => {
         <div style={styles.modalOverlay} onClick={() => setShowCreate(false)}>
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div style={styles.modalHeader}>
-              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' }}>Add User</h3>
+              <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#111827' }}>Add User</h3>
               <button onClick={() => setShowCreate(false)} style={{ ...styles.iconBtn, padding: 6, borderRadius: 8, background: '#f3f4f6' }}><FiX size={18} /></button>
             </div>
 
@@ -173,8 +173,8 @@ const Users = () => {
           <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div style={styles.modalHeader}>
               <div>
-                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#111827' }}>Edit User</h3>
-                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#6b7280' }}>{editUser.name} &middot; {editUser.phone}</p>
+                <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#111827' }}>Edit User</h3>
+                <p style={{ margin: '4px 0 0', fontSize: 15, color: '#6b7280' }}>{editUser.name} &middot; {editUser.phone}</p>
               </div>
               <button onClick={() => setEditUser(null)} style={{ ...styles.iconBtn, padding: 6, borderRadius: 8, background: '#f3f4f6' }}><FiX size={18} /></button>
             </div>
@@ -215,10 +215,10 @@ const Users = () => {
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 0 0', borderTop: '1px solid #f3f4f6', marginTop: 8 }}>
-                <span style={{ fontSize: 12, color: '#9ca3af' }}>Status:</span>
-                <span style={{ fontSize: 12, fontWeight: 600, color: editUser.isActive ? '#22c55e' : '#ef4444' }}>{editUser.isActive ? 'Active' : 'Inactive'}</span>
-                <span style={{ fontSize: 12, color: '#9ca3af', marginLeft: 12 }}>Created:</span>
-                <span style={{ fontSize: 12, color: '#6b7280' }}>{new Date(editUser.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                <span style={{ fontSize: 14, color: '#9ca3af' }}>Status:</span>
+                <span style={{ fontSize: 14, fontWeight: 600, color: editUser.isActive ? '#22c55e' : '#ef4444' }}>{editUser.isActive ? 'Active' : 'Inactive'}</span>
+                <span style={{ fontSize: 14, color: '#9ca3af', marginLeft: 12 }}>Created:</span>
+                <span style={{ fontSize: 14, color: '#6b7280' }}>{new Date(editUser.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
               </div>
             </div>
 
@@ -257,7 +257,7 @@ const Users = () => {
                 <td style={{ ...styles.td, color: '#6b7280' }}>{u.email || '-'}</td>
                 <td style={styles.td}>
                   <span style={{
-                    padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600,
+                    padding: '3px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600,
                     background: (roleColors[u.role] || '#6b7280') + '15',
                     color: roleColors[u.role] || '#6b7280',
                   }}>
@@ -268,7 +268,7 @@ const Users = () => {
                 <td style={{ ...styles.td, color: '#6b7280', textAlign: 'center' }}>{u.maxWhatsappAccounts || 1}</td>
                 <td style={styles.td}>
                   <span style={{
-                    padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600,
+                    padding: '3px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600,
                     background: u.isActive ? '#22c55e20' : '#ef444420',
                     color: u.isActive ? '#22c55e' : '#ef4444',
                   }}>
@@ -313,18 +313,18 @@ const styles = {
   primaryBtn: {
     display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px',
     background: '#e8b931', color: '#111827', border: 'none', borderRadius: 10,
-    fontWeight: 600, cursor: 'pointer', fontSize: 14, boxShadow: '0 2px 8px rgba(232,185,49,0.25)',
+    fontWeight: 600, cursor: 'pointer', fontSize: 16, boxShadow: '0 2px 8px rgba(232,185,49,0.25)',
   },
   secondaryBtn: {
     padding: '10px 20px', background: '#f3f4f6', color: '#374151',
-    border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 14,
+    border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 16,
   },
   iconBtn: { background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 4 },
   field: { marginBottom: 0 },
-  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 13 },
+  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 15 },
   input: {
     width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb',
-    borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#f9fafb',
+    borderRadius: 10, fontSize: 16, outline: 'none', boxSizing: 'border-box', background: '#f9fafb',
   },
   tableWrapper: {
     background: 'white', borderRadius: 14, overflow: 'hidden',
@@ -333,15 +333,15 @@ const styles = {
   table: { width: '100%', borderCollapse: 'collapse' },
   th: {
     textAlign: 'left', padding: '12px 16px', borderBottom: '2px solid #f3f4f6',
-    fontSize: 11, fontWeight: 600, color: '#9ca3af', background: '#f9fafb',
+    fontSize: 13, fontWeight: 600, color: '#9ca3af', background: '#f9fafb',
     textTransform: 'uppercase', letterSpacing: 0.5,
   },
   tr: { borderBottom: '1px solid #f3f4f6' },
-  td: { padding: '12px 16px', fontSize: 14 },
+  td: { padding: '12px 16px', fontSize: 16 },
   avatar: {
     width: 32, height: 32, borderRadius: '50%', background: '#374151',
     color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontWeight: 600, fontSize: 14, flexShrink: 0,
+    fontWeight: 600, fontSize: 16, flexShrink: 0,
   },
   actionBtn: {
     background: '#f9fafb', border: '1px solid #e5e7eb', cursor: 'pointer', padding: '6px 8px', borderRadius: 8,

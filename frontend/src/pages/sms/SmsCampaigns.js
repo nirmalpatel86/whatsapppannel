@@ -142,18 +142,20 @@ const SmsCampaigns = () => {
     <div style={{ padding: '24px 28px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 22, fontWeight: 700 }}>SMS Campaigns</h2>
-          <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>{campaigns.length} campaigns</p>
+          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 24, fontWeight: 700 }}>SMS Campaigns</h2>
+          <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>{campaigns.length} campaigns</p>
         </div>
         <button onClick={openCreate} style={styles.primaryBtn}><FiPlus size={18} /> New Campaign</button>
       </div>
 
       {showCreate && (
-        <div style={styles.createPanel}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#111827' }}>Create Campaign</h3>
-            <button onClick={() => setShowCreate(false)} style={styles.iconBtn}><FiX size={16} /></button>
+        <div style={styles.modalOverlay} onClick={() => setShowCreate(false)}>
+        <div style={styles.modal} onClick={e => e.stopPropagation()}>
+          <div style={styles.modalHeader}>
+            <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#111827' }}>Create Campaign</h3>
+            <button onClick={() => setShowCreate(false)} style={{ ...styles.iconBtn, padding: 6, borderRadius: 8, background: '#f3f4f6' }}><FiX size={18} /></button>
           </div>
+          <div style={styles.modalBody}>
           <div style={styles.formGrid}>
             <div style={styles.field}>
               <label style={styles.label}>Campaign Name *</label>
@@ -209,17 +211,19 @@ const SmsCampaigns = () => {
           <div style={{ ...styles.field, marginBottom: 14 }}>
             <label style={styles.label}>Message *</label>
             <textarea value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} style={{ ...styles.input, minHeight: 100, resize: 'vertical' }} placeholder="Type your message..." />
-            <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>{form.message.length} chars</div>
+            <div style={{ fontSize: 13, color: '#9ca3af', marginTop: 4 }}>{form.message.length} chars</div>
           </div>
           <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 14 }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: '#374151', cursor: 'pointer' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 15, color: '#374151', cursor: 'pointer' }}>
               <input type="checkbox" checked={form.isUnicode} onChange={e => setForm(f => ({ ...f, isUnicode: e.target.checked }))} /> Unicode
             </label>
           </div>
-          <div style={{ display: 'flex', gap: 12 }}>
-            <button onClick={createCampaign} disabled={submitting} style={styles.primaryBtn}>{submitting ? 'Creating...' : 'Create Campaign'}</button>
-            <button onClick={() => setShowCreate(false)} style={styles.secondaryBtn}>Cancel</button>
           </div>
+          <div style={styles.modalFooter}>
+            <button onClick={() => setShowCreate(false)} style={styles.secondaryBtn}>Cancel</button>
+            <button onClick={createCampaign} disabled={submitting} style={styles.primaryBtn}>{submitting ? 'Creating...' : 'Create Campaign'}</button>
+          </div>
+        </div>
         </div>
       )}
 
@@ -245,10 +249,10 @@ const SmsCampaigns = () => {
                 <tr key={c.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
                   <td style={styles.td}>
                     <span style={{ fontWeight: 500, color: '#111827' }}>{c.name}</span>
-                    {c.scheduledAt && <div style={{ fontSize: 11, color: '#9ca3af' }}><FiClock size={10} /> Scheduled</div>}
+                    {c.scheduledAt && <div style={{ fontSize: 13, color: '#9ca3af' }}><FiClock size={10} /> Scheduled</div>}
                   </td>
                   <td style={styles.td}>
-                    <span style={{ padding: '2px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600, background: sc.bg, color: sc.color }}>{c.status}</span>
+                    <span style={{ padding: '2px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600, background: sc.bg, color: sc.color }}>{c.status}</span>
                   </td>
                   <td style={styles.td}>{c.totalRecipients || 0}</td>
                   <td style={styles.td}>
@@ -257,7 +261,7 @@ const SmsCampaigns = () => {
                   </td>
                   <td style={{ ...styles.td, color: '#059669' }}>{c.deliveredCount || 0}</td>
                   <td style={{ ...styles.td, color: '#ef4444' }}>{c.failedCount || 0}</td>
-                  <td style={{ ...styles.td, fontSize: 12, color: '#9ca3af' }}>
+                  <td style={{ ...styles.td, fontSize: 14, color: '#9ca3af' }}>
                     {new Date(c.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                   </td>
                   <td style={styles.td}>
@@ -282,7 +286,7 @@ const SmsCampaigns = () => {
           <div style={{ padding: 60, textAlign: 'center', color: '#9ca3af' }}>
             <FiNavigation size={36} style={{ opacity: 0.3, marginBottom: 8 }} />
             <p style={{ margin: '0 0 4px', fontWeight: 500, color: '#6b7280' }}>No campaigns yet</p>
-            <p style={{ margin: 0, fontSize: 13 }}>Create your first SMS campaign</p>
+            <p style={{ margin: 0, fontSize: 15 }}>Create your first SMS campaign</p>
           </div>
         )}
       </div>
@@ -291,18 +295,22 @@ const SmsCampaigns = () => {
 };
 
 const styles = {
-  primaryBtn: { display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: '#3B82F6', color: '#ffffff', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 14, boxShadow: '0 2px 8px rgba(59,130,246,0.25)' },
-  secondaryBtn: { padding: '10px 20px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 14 },
+  primaryBtn: { display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: '#3B82F6', color: '#ffffff', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 16, boxShadow: '0 2px 8px rgba(59,130,246,0.25)' },
+  secondaryBtn: { padding: '10px 20px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 16 },
   iconBtn: { background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 4 },
-  createPanel: { background: 'white', borderRadius: 14, padding: 24, marginBottom: 24, boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' },
+  modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' },
+  modal: { background: 'white', borderRadius: 16, width: '100%', maxWidth: 680, boxShadow: '0 20px 60px rgba(0,0,0,0.15)', overflow: 'hidden', maxHeight: '90vh', display: 'flex', flexDirection: 'column' },
+  modalHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '20px 24px', borderBottom: '1px solid #f3f4f6', flexShrink: 0 },
+  modalBody: { padding: '20px 24px', overflow: 'auto', flex: 1 },
+  modalFooter: { display: 'flex', justifyContent: 'flex-end', gap: 12, padding: '16px 24px', borderTop: '1px solid #f3f4f6', background: '#f9fafb', flexShrink: 0 },
   formGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 16 },
   field: { marginBottom: 0 },
-  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 13 },
-  input: { width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#f9fafb' },
+  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 15 },
+  input: { width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 16, outline: 'none', boxSizing: 'border-box', background: '#f9fafb' },
   tableWrapper: { background: 'white', borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' },
   table: { width: '100%', borderCollapse: 'collapse' },
-  th: { textAlign: 'left', padding: '12px 14px', borderBottom: '2px solid #f3f4f6', fontSize: 11, fontWeight: 600, color: '#9ca3af', background: '#f9fafb', textTransform: 'uppercase', letterSpacing: 0.5 },
-  td: { padding: '12px 14px', fontSize: 13, color: '#374151' },
+  th: { textAlign: 'left', padding: '12px 14px', borderBottom: '2px solid #f3f4f6', fontSize: 13, fontWeight: 600, color: '#9ca3af', background: '#f9fafb', textTransform: 'uppercase', letterSpacing: 0.5 },
+  td: { padding: '12px 14px', fontSize: 15, color: '#374151' },
   actionBtn: { background: '#f9fafb', border: '1px solid #e5e7eb', cursor: 'pointer', padding: '6px 8px', borderRadius: 8 },
 };
 

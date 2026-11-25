@@ -70,8 +70,8 @@ const ContactGroups = () => {
     <div style={{ padding: '24px 28px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
-          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 22, fontWeight: 700 }}>Contact Groups</h2>
-          <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>{groups.length} groups</p>
+          <h2 style={{ margin: '0 0 4px', color: '#111827', fontSize: 24, fontWeight: 700 }}>Contact Groups</h2>
+          <p style={{ margin: 0, fontSize: 15, color: '#6b7280' }}>{groups.length} groups</p>
         </div>
         <button onClick={() => { setShowCreate(true); setSelectedContacts([]); }} style={styles.primaryBtn}><FiPlus size={18} /> New Group</button>
       </div>
@@ -79,7 +79,7 @@ const ContactGroups = () => {
       {showCreate && (
         <div style={styles.card}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#111827' }}>Create Group</h3>
+            <h3 style={{ margin: 0, fontSize: 17, fontWeight: 600, color: '#111827' }}>Create Group</h3>
             <button onClick={() => setShowCreate(false)} style={styles.iconBtn}><FiX size={16} /></button>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
@@ -94,10 +94,10 @@ const ContactGroups = () => {
                 <label key={c.id} style={styles.contactOption}>
                   <input type="checkbox" checked={selectedContacts.includes(c.id)} onChange={() => toggleContact(c.id)} style={{ accentColor: '#e8b931' }} />
                   <div style={styles.miniAvatar}>{(c.name || c.phone)[0].toUpperCase()}</div>
-                  <div style={{ flex: 1 }}><div style={{ fontSize: 13, fontWeight: 500, color: '#111827' }}>{c.name || c.phone}</div><div style={{ fontSize: 11, color: '#9ca3af' }}>{c.phone}</div></div>
+                  <div style={{ flex: 1 }}><div style={{ fontSize: 15, fontWeight: 500, color: '#111827' }}>{c.name || c.phone}</div><div style={{ fontSize: 13, color: '#9ca3af' }}>{c.phone}</div></div>
                 </label>
               ))}
-              {filteredContacts.length === 0 && <div style={{ padding: 20, textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>No contacts found</div>}
+              {filteredContacts.length === 0 && <div style={{ padding: 20, textAlign: 'center', color: '#9ca3af', fontSize: 15 }}>No contacts found</div>}
             </div>
           </div>
           <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
@@ -114,8 +114,8 @@ const ContactGroups = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={styles.groupIcon}><FiUsers size={18} /></div>
                 <div>
-                  <div style={{ fontWeight: 600, fontSize: 15, color: '#111827' }}>{group.name}</div>
-                  <div style={{ fontSize: 12, color: '#9ca3af' }}>{group.memberCount} contacts{group.description ? ` · ${group.description}` : ''}</div>
+                  <div style={{ fontWeight: 600, fontSize: 17, color: '#111827' }}>{group.name}</div>
+                  <div style={{ fontSize: 14, color: '#9ca3af' }}>{group.memberCount} contacts{group.description ? ` · ${group.description}` : ''}</div>
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 6 }}>
@@ -128,18 +128,18 @@ const ContactGroups = () => {
               <div style={{ marginTop: 16, borderTop: '1px solid #f3f4f6', paddingTop: 12 }}>
                 {showAddMembers === group.id && (
                   <div style={{ marginBottom: 16, padding: 12, background: '#f9fafb', borderRadius: 10, border: '1px solid #f3f4f6' }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: '#111827' }}>Add Contacts</div>
+                    <div style={{ fontSize: 15, fontWeight: 600, marginBottom: 8, color: '#111827' }}>Add Contacts</div>
                     <div style={styles.pickerSearch}><FiSearch size={14} color="#9ca3af" /><input value={memberSearch} onChange={e => setMemberSearch(e.target.value)} placeholder="Search..." style={styles.pickerInput} /></div>
                     <div style={{ ...styles.contactList, maxHeight: 160 }}>
                       {availableContacts.map(c => (
                         <label key={c.id} style={styles.contactOption}>
                           <input type="checkbox" checked={selectedContacts.includes(c.id)} onChange={() => toggleContact(c.id)} style={{ accentColor: '#e8b931' }} />
-                          <span style={{ fontSize: 13, color: '#111827' }}>{c.name || c.phone}</span>
-                          <span style={{ fontSize: 11, color: '#9ca3af', marginLeft: 'auto' }}>{c.phone}</span>
+                          <span style={{ fontSize: 15, color: '#111827' }}>{c.name || c.phone}</span>
+                          <span style={{ fontSize: 13, color: '#9ca3af', marginLeft: 'auto' }}>{c.phone}</span>
                         </label>
                       ))}
                     </div>
-                    <button onClick={() => addMembersToGroup(group.id)} style={{ ...styles.primaryBtn, marginTop: 8, padding: '6px 16px', fontSize: 13 }}>Add {selectedContacts.length} Contact{selectedContacts.length !== 1 ? 's' : ''}</button>
+                    <button onClick={() => addMembersToGroup(group.id)} style={{ ...styles.primaryBtn, marginTop: 8, padding: '6px 16px', fontSize: 15 }}>Add {selectedContacts.length} Contact{selectedContacts.length !== 1 ? 's' : ''}</button>
                   </div>
                 )}
                 {groupMembers.length > 0 ? (
@@ -147,13 +147,13 @@ const ContactGroups = () => {
                     {groupMembers.map(m => (
                       <div key={m.id} style={styles.memberChip}>
                         <div style={styles.miniAvatar}>{(m.name || m.phone)[0].toUpperCase()}</div>
-                        <div><div style={{ fontSize: 12, fontWeight: 500, color: '#111827' }}>{m.name || m.phone}</div><div style={{ fontSize: 10, color: '#9ca3af' }}>{m.phone}</div></div>
+                        <div><div style={{ fontSize: 14, fontWeight: 500, color: '#111827' }}>{m.name || m.phone}</div><div style={{ fontSize: 12, color: '#9ca3af' }}>{m.phone}</div></div>
                         <button onClick={() => removeMember(group.id, m.id)} style={{ ...styles.iconBtn, padding: 2 }}><FiX size={12} color="#ef4444" /></button>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div style={{ padding: 16, textAlign: 'center', color: '#9ca3af', fontSize: 13 }}>No members yet.</div>
+                  <div style={{ padding: 16, textAlign: 'center', color: '#9ca3af', fontSize: 15 }}>No members yet.</div>
                 )}
               </div>
             )}
@@ -165,7 +165,7 @@ const ContactGroups = () => {
         <div style={{ textAlign: 'center', padding: 60, color: '#9ca3af' }}>
           <FiUsers size={48} style={{ opacity: 0.3, marginBottom: 12 }} />
           <h3 style={{ color: '#6b7280', margin: '0 0 8px' }}>No groups yet</h3>
-          <p style={{ margin: 0, fontSize: 14 }}>Create a group to organize contacts for campaigns.</p>
+          <p style={{ margin: 0, fontSize: 16 }}>Create a group to organize contacts for campaigns.</p>
         </div>
       )}
     </div>
@@ -173,20 +173,20 @@ const ContactGroups = () => {
 };
 
 const styles = {
-  primaryBtn: { display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: '#e8b931', color: '#111827', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 14, boxShadow: '0 2px 8px rgba(232,185,49,0.25)' },
-  secondaryBtn: { padding: '10px 20px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 14 },
+  primaryBtn: { display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', background: '#e8b931', color: '#111827', border: 'none', borderRadius: 10, fontWeight: 600, cursor: 'pointer', fontSize: 16, boxShadow: '0 2px 8px rgba(232,185,49,0.25)' },
+  secondaryBtn: { padding: '10px 20px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 16 },
   card: { background: 'white', borderRadius: 14, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' },
-  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 13 },
-  input: { width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box', background: '#f9fafb' },
+  label: { display: 'block', marginBottom: 6, fontWeight: 500, color: '#374151', fontSize: 15 },
+  input: { width: '100%', padding: '10px 12px', border: '1px solid #e5e7eb', borderRadius: 10, fontSize: 16, outline: 'none', boxSizing: 'border-box', background: '#f9fafb' },
   groupIcon: { width: 42, height: 42, borderRadius: 10, background: '#e8b931', color: '#111827', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
   actionBtn: { display: 'flex', alignItems: 'center', padding: 8, background: '#f3f4f6', border: '1px solid #e5e7eb', borderRadius: 8, cursor: 'pointer', color: '#374151' },
   iconBtn: { background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 4 },
   contactPicker: { border: '1px solid #e5e7eb', borderRadius: 10, overflow: 'hidden' },
   pickerSearch: { display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderBottom: '1px solid #f3f4f6', background: '#f9fafb' },
-  pickerInput: { flex: 1, border: 'none', outline: 'none', fontSize: 13, background: 'transparent', color: '#111827' },
+  pickerInput: { flex: 1, border: 'none', outline: 'none', fontSize: 15, background: 'transparent', color: '#111827' },
   contactList: { maxHeight: 220, overflow: 'auto' },
-  contactOption: { display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid #f9fafb', fontSize: 13 },
-  miniAvatar: { width: 28, height: 28, borderRadius: '50%', background: '#374151', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 12, flexShrink: 0 },
+  contactOption: { display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid #f9fafb', fontSize: 15 },
+  miniAvatar: { width: 28, height: 28, borderRadius: '50%', background: '#374151', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: 14, flexShrink: 0 },
   memberChip: { display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: '#f9fafb', borderRadius: 20, border: '1px solid #e5e7eb' },
 };
 

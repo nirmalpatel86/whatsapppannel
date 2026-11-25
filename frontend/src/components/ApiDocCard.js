@@ -13,7 +13,7 @@ const ApiDocCard = ({ title, endpoint, headers = [], parameters = [], curlCode, 
 
   return (
     <div style={styles.wrapper}>
-      <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 700, color: '#111827' }}>{title}</h3>
+      <h3 style={{ margin: '0 0 16px', fontSize: 18, fontWeight: 700, color: '#111827' }}>{title}</h3>
 
       <div style={styles.section}>
         <div style={styles.sectionTitle}>Endpoint</div>
@@ -70,8 +70,8 @@ const ApiDocCard = ({ title, endpoint, headers = [], parameters = [], curlCode, 
       </div>
 
       <div style={{ ...styles.tip, borderColor: `${accent}30`, background: `${accent}08` }}>
-        <div style={{ fontWeight: 600, fontSize: 13, color: '#111827', marginBottom: 8 }}>How to import in Postman?</div>
-        <ol style={{ margin: 0, paddingLeft: 18, fontSize: 13, color: '#4b5563', lineHeight: 1.8 }}>
+        <div style={{ fontWeight: 600, fontSize: 15, color: '#111827', marginBottom: 8 }}>How to import in Postman?</div>
+        <ol style={{ margin: 0, paddingLeft: 18, fontSize: 15, color: '#4b5563', lineHeight: 1.8 }}>
           <li>Click Copy cURL button above</li>
           <li>Open Postman → Click Import button (top-left)</li>
           <li>Paste the copied cURL in the "Paste cURL to import..." text box</li>
@@ -85,14 +85,14 @@ const ApiDocCard = ({ title, endpoint, headers = [], parameters = [], curlCode, 
 const styles = {
   wrapper: { background: 'white', borderRadius: 14, padding: 24, boxShadow: '0 1px 3px rgba(0,0,0,0.04)', border: '1px solid #e5e7eb' },
   section: { marginBottom: 20 },
-  sectionTitle: { fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 },
+  sectionTitle: { fontSize: 14, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 },
   endpointRow: { display: 'flex', alignItems: 'center', gap: 10, background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: 10, padding: '10px 12px' },
-  endpointCode: { flex: 1, fontSize: 13, color: '#111827', wordBreak: 'break-all', fontFamily: 'monospace' },
-  copyBtn: { display: 'flex', alignItems: 'center', gap: 6, background: 'white', border: '1px solid', borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' },
+  endpointCode: { flex: 1, fontSize: 15, color: '#111827', wordBreak: 'break-all', fontFamily: 'monospace' },
+  copyBtn: { display: 'flex', alignItems: 'center', gap: 6, background: 'white', border: '1px solid', borderRadius: 8, padding: '6px 12px', fontSize: 14, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' },
   table: { width: '100%', borderCollapse: 'collapse' },
-  th: { textAlign: 'left', padding: '8px 10px', borderBottom: '2px solid #f3f4f6', fontSize: 11, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 0.5 },
-  td: { padding: '8px 10px', fontSize: 13, color: '#374151', verticalAlign: 'top' },
-  pre: { background: '#0f172a', color: '#e2e8f0', borderRadius: 10, padding: 16, fontSize: 12.5, lineHeight: 1.7, overflowX: 'auto', margin: 0, fontFamily: 'monospace' },
+  th: { textAlign: 'left', padding: '8px 10px', borderBottom: '2px solid #f3f4f6', fontSize: 13, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: 0.5 },
+  td: { padding: '8px 10px', fontSize: 15, color: '#374151', verticalAlign: 'top' },
+  pre: { background: '#0f172a', color: '#e2e8f0', borderRadius: 10, padding: 16, fontSize: 14.5, lineHeight: 1.7, overflowX: 'auto', margin: 0, fontFamily: 'monospace' },
   tip: { border: '1px solid', borderRadius: 10, padding: 16 },
 };
 

@@ -19,6 +19,10 @@ const BmCompany = bulkmailSequelize.define('BmCompany', {
     type: DataTypes.ENUM('free', 'basic', 'pro', 'enterprise'),
     defaultValue: 'free',
   },
+  maxCampaignsPerDay: {
+    type: DataTypes.INTEGER,
+    defaultValue: 5,
+  },
   isActive: {
     type: DataTypes.BOOLEAN,
     defaultValue: true,

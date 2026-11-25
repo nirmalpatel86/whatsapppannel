@@ -116,6 +116,12 @@ exports.pause = async (req, res) => {
   try {
     const campaign = await BmCampaign.findByPk(req.params.id);
     if (!campaign) return res.status(404).json({ error: 'Campaign not found' });
+    if (req.user.role !== 'super_admin') {
+      const visibleCompanyIds = await getVisibleCompanyIds(BmUser, req.user);
+      if (!visibleCompanyIds.includes(campaign.companyId)) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+    }
     if (campaign.status !== 'running') {
       return res.status(400).json({ error: 'Campaign is not running' });
     }
@@ -130,6 +136,12 @@ exports.stats = async (req, res) => {
   try {
     const campaign = await BmCampaign.findByPk(req.params.id);
     if (!campaign) return res.status(404).json({ error: 'Campaign not found' });
+    if (req.user.role !== 'super_admin') {
+      const visibleCompanyIds = await getVisibleCompanyIds(BmUser, req.user);
+      if (!visibleCompanyIds.includes(campaign.companyId)) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+    }
 
     const emailStats = await BmCampaignEmail.findAll({
       where: { campaignId: campaign.id },
@@ -277,9 +289,12 @@ async function runEmailCampaign(campaignId) {
       htmlBody = htmlBody.replace(/\{name\}/gi, contact.name || '')
         .replace(/\{email\}/gi, contact.email || '')
         .replace(/\{company\}/gi, contact.companyName || '')
+        .replace(/\{profession\}/gi, contact.profession || '')
         .replace(/\{col1\}/gi, contact.col1 || '')
         .replace(/\{col2\}/gi, contact.col2 || '')
-        .replace(/\{col3\}/gi, contact.col3 || '');
+        .replace(/\{col3\}/gi, contact.col3 || '')
+        .replace(/\{col4\}/gi, contact.col4 || '')
+        .replace(/\{col5\}/gi, contact.col5 || '');
 
       // Add tracking pixel before closing body tag
       if (htmlBody.includes('</body>')) {
@@ -370,3 +385,5 @@ exports.unsubscribe = async (req, res) => {
     res.send('<html><body><h2>Unsubscribe processed.</h2></body></html>');
   }
 };
+
+exports.runEmailCampaign = runEmailCampaign;
