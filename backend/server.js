@@ -34,6 +34,13 @@ const io = new Server(server, {
   cors: { origin: '*', methods: ['GET', 'POST'] },
 });
 
+// Production runs behind a single reverse proxy (nginx), which sets
+// X-Forwarded-For. Without this, Express ignores that header (req.ip is the
+// proxy's own address, so every visitor shares one rate-limit bucket) while
+// express-rate-limit still throws, having spotted the header unused. Harmless
+// with no proxy in front, e.g. local dev — there's no X-Forwarded-For to trust.
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(helmet({
   // This is a JSON API (not an HTML app), and a CSP tuned for that would need
